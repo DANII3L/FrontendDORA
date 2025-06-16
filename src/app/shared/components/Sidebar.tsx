@@ -66,10 +66,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                       <Link
                         to={item.href}
                         className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                          location.pathname === item.href && item.name === 'Dashboard'
+                          location.pathname === item.href
                             ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
-                            : location.pathname === item.href
-                            ? 'bg-accent-light text-accent-text shadow-sm'
                             : 'text-text-secondary hover:text-text-primary hover:bg-background'
                         }`}
                         onClick={() => setOpen(false)}
@@ -104,10 +102,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                       <Link
                         to={item.href}
                         className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-all duration-200 ${
-                          location.pathname === item.href && item.name === 'Dashboard'
+                          location.pathname === item.href
                             ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
-                            : location.pathname === item.href
-                            ? 'bg-accent-light text-accent-text shadow-sm'
                             : 'text-text-secondary hover:text-text-primary hover:bg-background'
                         }`}
                       >
