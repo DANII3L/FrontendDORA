@@ -11,7 +11,8 @@ import {
   Settings,
   X,
   UserCheck,
-  Kanban
+  Kanban,
+  MessageSquare
 } from 'lucide-react';
 
 const navigation = [
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'Productos', href: '/productos', icon: Package },
   { name: 'Reportes', href: '/reportes', icon: BarChart3 },
   { name: 'Configuración', href: '/configuracion', icon: Settings },
+  { name: 'Hablar con DORA', href: '/dora-chat', icon: MessageSquare },
 ];
 
 interface SidebarProps {
@@ -89,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-card-background px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-orange-primary to-red-primary rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">C</span>
+              <span className="text-white font-bold text-xl">AI</span>
             </div>
             <span className="text-text-primary text-2xl font-bold">D.O.R.A</span>
           </div>

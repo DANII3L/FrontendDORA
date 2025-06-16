@@ -31,6 +31,7 @@ import UsuarioForm from './app/configuracion/components/UsuarioForm';
 import Roles from './app/configuracion/components/Roles';
 import AjustesGenerales from './app/configuracion/components/AjustesGenerales';
 import ProtectedRoute from './app/core/guards/ProtectedRoute';
+import DoraChat from './app/dora/components/DoraChat';
 
 function App() {
   return (
@@ -88,6 +89,9 @@ function App() {
               <Route path="usuarios/:id/editar" element={<UsuarioForm />} />
               <Route path="roles" element={<Roles />} />
               <Route path="configuracion" element={<AjustesGenerales />} />
+              
+              {/* DORA AI Chat */}
+              <Route path="dora-chat" element={<DoraChat />} />
             </Route>
           </Routes>
         </Router>

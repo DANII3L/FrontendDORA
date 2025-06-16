@@ -1,128 +1,114 @@
-import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { Eye, EyeOff } from 'lucide-react';
+import { useTheme } from '../../shared/contexts/ThemeContext';
 
-const Login: React.FC = () => {
+export default function Login() {
   const [email, setEmail] = useState('admin@crm.com');
   const [password, setPassword] = useState('admin123');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { login, isAuthenticated } = useAuth();
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { theme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (!success) {
-        setError('Credenciales inválidas');
-      }
-    } catch (error) {
-      setError('Error al iniciar sesión');
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Credenciales inválidas');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex">
+      {/* Lado izquierdo - Logo DORA */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-primary to-red-primary items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-orange-primary to-red-primary rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-white font-bold text-2xl">C</span>
-          </div>
-          <h2 className="text-3xl font-extrabold text-text-primary">Iniciar Sesión</h2>
-          <p className="mt-2 text-text-secondary">Accede a tu panel de CRM</p>
+          <h1 className="text-8xl font-bold text-white mb-4">DORA</h1>
+          <p className="text-xl text-white/80">Tu asistente inteligente de CRM</p>
         </div>
-        
-        <div className="bg-card-background backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-border">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-status-red-light border border-status-red-light text-status-red px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-2">
-                Correo Electrónico
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-3 border border-border placeholder:text-text-secondary text-text-primary bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary focus:z-10 sm:text-sm transition-colors duration-200"
-                placeholder="Ingresa tu email"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-text-secondary mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none relative block w-full px-3 py-3 pr-10 border border-border placeholder:text-text-secondary text-text-primary bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary focus:z-10 sm:text-sm transition-colors duration-200"
-                  placeholder="Ingresa tu contraseña"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-text-secondary hover:text-text-primary" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-text-secondary hover:text-text-primary" />
-                  )}
-                </button>
-              </div>
-            </div>
+      </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-              >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-                ) : (
-                  'Iniciar Sesión'
-                )}
-              </button>
+      {/* Lado derecho - Formulario de login */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-xl transform hover:scale-[1.02] transition-all duration-300 ease-out">
+          <div className="relative">
+            {/* Tarjeta principal */}
+            <div className="bg-card-background rounded-3xl shadow-2xl p-10 border border-border-color relative overflow-hidden">
+              {/* Contenido del formulario */}
+              <div className="relative">
+                <div className="text-center mb-10">
+                  <h2 className="text-4xl font-bold text-text-primary mb-4">Bienvenido</h2>
+                  <p className="text-text-secondary text-lg">Ingresa tus credenciales para continuar</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
+                      Correo electrónico
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-6 py-3 rounded-xl border border-border-color bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-light transition-all duration-200"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
+                      Contraseña
+                    </label>
+                    <input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-6 py-3 rounded-xl border border-border-color bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-light transition-all duration-200"
+                      required
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded-lg">{error}</div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-orange-primary to-red-primary text-white py-4 px-6 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl text-lg font-medium"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                        Iniciando sesión...
+                      </div>
+                    ) : (
+                      'Iniciar sesión'
+                    )}
+                  </button>
+
+                  <div className="text-center mt-6">
+                    <p className="text-sm text-text-secondary">
+                      Demo: admin@crm.com / admin123
+                    </p>
+                  </div>
+                </form>
+              </div>
             </div>
-            
-            <div className="text-center">
-              <p className="text-sm text-text-secondary">
-                Demo: admin@crm.com / admin123
-              </p>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Login;
+}
