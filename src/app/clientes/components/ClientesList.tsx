@@ -9,10 +9,13 @@ import {
   PhoneIcon,
   BuildingOfficeIcon
 } from '@heroicons/react/24/outline';
+import Pagination from '../../shared/components/Pagination';
 
 const ClientesList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('todos');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
 
   const clientes = [
     {
@@ -58,6 +61,61 @@ const ClientesList: React.FC = () => {
       valor: '$50,000',
       ultimaActividad: '2024-01-10',
       industria: 'Servicios'
+    },
+    {
+      id: 5,
+      nombre: 'Innovate Solutions',
+      contacto: 'Pedro Gómez',
+      email: 'pedro.gomez@innovate.com',
+      telefono: '+1 (555) 111-2222',
+      estado: 'activo',
+      valor: '$90,000',
+      ultimaActividad: '2024-01-20',
+      industria: 'Consultoría'
+    },
+    {
+      id: 6,
+      nombre: 'Dynamic Systems',
+      contacto: 'Laura Fernández',
+      email: 'laura.fernandez@dynamic.com',
+      telefono: '+1 (555) 333-4444',
+      estado: 'prospecto',
+      valor: '$60,000',
+      ultimaActividad: '2024-01-18',
+      industria: 'Energía'
+    },
+    {
+      id: 7,
+      nombre: 'Future Tech',
+      contacto: 'Miguel Torres',
+      email: 'miguel.torres@futuretech.com',
+      telefono: '+1 (555) 555-6666',
+      estado: 'activo',
+      valor: '$150,000',
+      ultimaActividad: '2024-01-22',
+      industria: 'Robótica'
+    },
+    {
+      id: 8,
+      nombre: 'Creative Minds',
+      contacto: 'Sofía Ruíz',
+      email: 'sofia.ruiz@creative.com',
+      telefono: '+1 (555) 777-8888',
+      estado: 'inactivo',
+      valor: '$30,000',
+      ultimaActividad: '2024-01-19',
+      industria: 'Publicidad'
+    },
+    {
+      id: 9,
+      nombre: 'Digital Solutions',
+      contacto: 'Ricardo Castro',
+      email: 'ricardo.castro@digital.com',
+      telefono: '+1 (555) 999-0000',
+      estado: 'activo',
+      valor: '$180,000',
+      ultimaActividad: '2024-01-21',
+      industria: 'Marketing Digital'
     }
   ];
 
@@ -70,6 +128,20 @@ const ClientesList: React.FC = () => {
     
     return matchesSearch && matchesFilter;
   });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredClientes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredClientes.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleItemsPerPageChange = (numItems: number) => {
+    setItemsPerPage(numItems);
+    setCurrentPage(1);
+  };
 
   const getEstadoColor = (estado: string) => {
     switch (estado) {
@@ -132,7 +204,7 @@ const ClientesList: React.FC = () => {
 
       {/* Clients Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredClientes.map((cliente) => (
+        {currentItems.map((cliente) => (
           <div key={cliente.id} className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border hover:border-text-secondary transition-all duration-300 hover:shadow-xl group">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -189,6 +261,16 @@ const ClientesList: React.FC = () => {
             {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Comienza agregando un nuevo cliente'}
           </p>
         </div>
+      )}
+
+      {filteredClientes.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
       )}
     </div>
   );

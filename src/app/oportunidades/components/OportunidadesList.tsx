@@ -8,10 +8,13 @@ import {
   CalendarIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
+import Pagination from '../../shared/components/Pagination';
 
 const OportunidadesList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('todas');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6); // Estado para ítems por página
 
   const oportunidades = [
     {
@@ -43,7 +46,57 @@ const OportunidadesList: React.FC = () => {
       fechaCierre: '2024-03-10',
       probabilidad: 25,
       responsable: 'Carlos Rodríguez'
-    }
+    },
+    {
+      id: 4,
+      nombre: 'Implementación de ERP',
+      cliente: 'Global Solutions',
+      valor: '$300,000',
+      estado: 'negociacion',
+      fechaCierre: '2024-03-20',
+      probabilidad: 80,
+      responsable: 'Ana López'
+    },
+    {
+      id: 5,
+      nombre: 'Desarrollo de App Móvil',
+      cliente: 'Mobile Innovations',
+      valor: '$90,000',
+      estado: 'propuesta',
+      fechaCierre: '2024-03-25',
+      probabilidad: 60,
+      responsable: 'Pedro Martínez'
+    },
+    {
+      id: 6,
+      nombre: 'Servicios de Ciberseguridad',
+      cliente: 'Secure Corp',
+      valor: '$180,000',
+      estado: 'calificacion',
+      fechaCierre: '2024-04-01',
+      probabilidad: 40,
+      responsable: 'Sofía García'
+    },
+    {
+      id: 7,
+      nombre: 'Actualización de Infraestructura',
+      cliente: 'Old Systems Inc.',
+      valor: '$100,000',
+      estado: 'ganada',
+      fechaCierre: '2024-01-30',
+      probabilidad: 100,
+      responsable: 'Juan Pérez'
+    },
+    {
+      id: 8,
+      nombre: 'Soporte Técnico Anual',
+      cliente: 'New Startups LLC',
+      valor: '$50,000',
+      estado: 'perdida',
+      fechaCierre: '2024-02-01',
+      probabilidad: 0,
+      responsable: 'María García'
+    },
   ];
 
   const filteredOportunidades = oportunidades.filter(oportunidad => {
@@ -54,6 +107,21 @@ const OportunidadesList: React.FC = () => {
     
     return matchesSearch && matchesFilter;
   });
+
+  // Lógica de paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredOportunidades.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredOportunidades.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleItemsPerPageChange = (numItems: number) => {
+    setItemsPerPage(numItems);
+    setCurrentPage(1); // Resetear a la primera página cuando cambian los ítems por página
+  };
 
   const getEstadoColor = (estado: string) => {
     switch (estado) {
@@ -122,7 +190,7 @@ const OportunidadesList: React.FC = () => {
 
       {/* Opportunities Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredOportunidades.map((oportunidad) => (
+        {currentItems.map((oportunidad) => (
           <div key={oportunidad.id} className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border hover:border-text-secondary transition-all duration-300 hover:shadow-xl group">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -195,6 +263,16 @@ const OportunidadesList: React.FC = () => {
             {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Comienza agregando una nueva oportunidad'}
           </p>
         </div>
+      )}
+
+      {filteredOportunidades.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
       )}
     </div>
   );

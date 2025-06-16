@@ -8,8 +8,9 @@ import Dashboard from './app/dashboard/components/Dashboard';
 import ClientesList from './app/clientes/components/ClientesList';
 import ClienteDetalle from './app/clientes/components/ClienteDetalle';
 import ClienteForm from './app/clientes/components/ClienteForm';
-import ContactosList from './app/clientes/components/ContactosList';
-import ContactoForm from './app/clientes/components/ContactoForm';
+import ContactosList from './app/contactos/components/ContactosList';
+import ContactoForm from './app/contactos/components/ContactoForm';
+import ContactosReportes from './app/contactos/components/ContactosReportes';
 import OportunidadesList from './app/oportunidades/components/OportunidadesList';
 import OportunidadDetalle from './app/oportunidades/components/OportunidadDetalle';
 import OportunidadForm from './app/oportunidades/components/OportunidadForm';
@@ -32,6 +33,10 @@ import Roles from './app/configuracion/components/Roles';
 import AjustesGenerales from './app/configuracion/components/AjustesGenerales';
 import ProtectedRoute from './app/core/guards/ProtectedRoute';
 import DoraChat from './app/dora/components/DoraChat';
+import TicketsReportes from './app/tickets/components/TicketsReportes';
+import ProductosReportes from './app/productos/components/ProductosReportes';
+import TareasReportes from './app/tareas/components/TareasReportes';
+import OportunidadesReportes from './app/oportunidades/components/OportunidadesReportes';
 
 function App() {
   return (
@@ -49,15 +54,20 @@ function App() {
               <Route path="clientes/nuevo" element={<ClienteForm />} />
               <Route path="clientes/:id" element={<ClienteDetalle />} />
               <Route path="clientes/:id/editar" element={<ClienteForm />} />
+              <Route path="clientes/reportes" element={<ReporteClientes />} />
+              
+              {/* Contactos */}
               <Route path="contactos" element={<ContactosList />} />
               <Route path="contactos/nuevo" element={<ContactoForm />} />
               <Route path="contactos/:id/editar" element={<ContactoForm />} />
+              <Route path="contactos/reportes" element={<ContactosReportes />} />
               
               {/* Oportunidades */}
               <Route path="oportunidades" element={<OportunidadesList />} />
               <Route path="oportunidades/nuevo" element={<OportunidadForm />} />
               <Route path="oportunidades/:id" element={<OportunidadDetalle />} />
               <Route path="oportunidades/:id/editar" element={<OportunidadForm />} />
+              <Route path="oportunidades/reportes" element={< OportunidadesReportes />} />
               <Route path="ventas/kanban" element={<KanbanVentas />} />
               
               {/* Tareas */}
@@ -65,6 +75,7 @@ function App() {
               <Route path="tareas/nuevo" element={<TareaForm />} />
               <Route path="tareas/:id" element={<TareaDetalle />} />
               <Route path="tareas/:id/editar" element={<TareaForm />} />
+              <Route path="tareas/reportes" element={<TareasReportes />} />
               <Route path="calendario" element={<Calendario />} />
               
               {/* Soporte */}
@@ -72,16 +83,13 @@ function App() {
               <Route path="tickets/nuevo" element={<TicketForm />} />
               <Route path="tickets/:id" element={<TicketDetalle />} />
               <Route path="tickets/:id/editar" element={<TicketForm />} />
+              <Route path="tickets/reportes" element={< TicketsReportes />} />
               
               {/* Productos */}
               <Route path="productos" element={<ProductosList />} />
               <Route path="productos/nuevo" element={<ProductoForm />} />
               <Route path="productos/:id/editar" element={<ProductoForm />} />
-              
-              {/* Reportes */}
-              <Route path="reportes" element={<ReportesDashboard />} />
-              <Route path="reportes/ventas" element={<ReporteVentas />} />
-              <Route path="reportes/clientes" element={<ReporteClientes />} />
+              <Route path="productos/reportes" element={< ProductosReportes />} />
               
               {/* Configuración */}
               <Route path="usuarios" element={<UsuariosList />} />
