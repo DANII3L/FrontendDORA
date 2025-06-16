@@ -4,18 +4,13 @@ import {
   Users,
   UserPlus,
   Building2,
-  Phone,
   Calendar,
-  FileText,
   Settings,
   BarChart3,
   ChevronDown,
   ChevronRight,
   LayoutDashboard,
-  ShoppingCart,
-  Tag,
   Ticket,
-  CheckSquare,
   Package,
 } from 'lucide-react';
 

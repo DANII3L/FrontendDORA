@@ -9,7 +9,7 @@ import {
   Calendar,
   Bell
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useTheme } from '../../shared/contexts/ThemeContext';
 
 const Dashboard: React.FC = () => {
@@ -133,8 +133,8 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={salesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="name" stroke="var(--color-text-secondary)" />
-              <YAxis stroke="var(--color-text-secondary)" />
+              <XAxis dataKey="name" stroke={theme === 'dark' ? '#FFFFFF' : 'var(--color-text-secondary)'} />
+              <YAxis stroke={theme === 'dark' ? '#FFFFFF' : 'var(--color-text-secondary)'} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'var(--color-card-background)', 

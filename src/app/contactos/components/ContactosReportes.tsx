@@ -3,12 +3,8 @@ import {
   BarChart3,
   UserCheck,
   TrendingUp,
-  Calendar,
-  MapPin,
-  Building2,
   Activity,
   Mail,
-  Phone,
 } from 'lucide-react';
 
 const ContactosReportes: React.FC = () => {

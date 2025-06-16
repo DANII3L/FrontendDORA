@@ -96,7 +96,7 @@ const MarketingIdeas: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            to="/productos"
+            to="/marketing"
             className="p-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-lg transition-colors duration-200"
           >
             <ArrowLeftIcon className="h-5 w-5" />
@@ -107,7 +107,7 @@ const MarketingIdeas: React.FC = () => {
           </div>
         </div>
         <Link
-          to="/productos/ideas-marketing/nueva"
+          to="/marketing/nueva"
           className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           <PlusIcon className="h-5 w-5" />
@@ -156,7 +156,7 @@ const MarketingIdeas: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-text-secondary">Estado: {idea.status}</span>
                 <Link
-                  to={`/productos/ideas-marketing/${idea.id}/editar`}
+                  to={`/marketing/${idea.id}/editar`}
                   className="text-text-secondary hover:text-orange-primary transition-colors duration-200"
                   title="Editar Idea"
                 >

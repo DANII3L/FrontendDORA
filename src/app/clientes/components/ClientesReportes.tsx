@@ -3,8 +3,6 @@ import {
   BarChart3,
   Users,
   TrendingUp,
-  Calendar,
-  MapPin,
   Building2,
   Activity,
 } from 'lucide-react';
