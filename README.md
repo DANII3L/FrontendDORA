@@ -1,7 +1,7 @@
 # D.O.R.A. - CRM Moderno
 
 ## Descripción del Proyecto
-D.O.R.A. (Dynamic Operational Relationship Application) es un sistema CRM (Customer Relationship Management) moderno y responsivo diseñado para gestionar clientes, oportunidades de venta, tareas, tickets de soporte y productos de manera eficiente. Este proyecto se enfoca en proporcionar una interfaz de usuario intuitiva y adaptable, con soporte para temas claro y oscuro, y visualizaciones de datos interactivas para una mejor toma de decisiones.
+D.O.R.A. (Desarrollo Organizacional y Registro Automatizado) es un sistema CRM (Customer Relationship Management) moderno y responsivo diseñado para gestionar clientes, oportunidades de venta, tareas, tickets de soporte y productos de manera eficiente. Este proyecto se enfoca en proporcionar una interfaz de usuario intuitiva y adaptable, con soporte para temas claro y oscuro, y visualizaciones de datos interactivas para una mejor toma de decisiones.
 
 ## Características
 - **Gestión de Clientes**: Añade, edita y visualiza detalles de tus clientes.
