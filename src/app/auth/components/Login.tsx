@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { useTheme } from '../../shared/contexts/ThemeContext';
+import { Moon, Sun, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('admin@crm.com');
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +44,7 @@ export default function Login() {
         <div className="w-full max-w-xl transform hover:scale-[1.02] transition-all duration-300 ease-out">
           <div className="relative">
             {/* Tarjeta principal */}
-            <div className="bg-card-background rounded-3xl shadow-2xl p-10 border border-border-color relative overflow-hidden">
+            <div className="bg-card-background rounded-3xl shadow-2xl p-10 border border-border-color relative">
               {/* Contenido del formulario */}
               <div className="relative">
                 <div className="text-center mb-10">
@@ -69,14 +71,24 @@ export default function Login() {
                     <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
                       Contraseña
                     </label>
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-6 py-3 rounded-xl border border-border-color bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-light transition-all duration-200"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-6 py-3 rounded-xl border border-border-color bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-light transition-all duration-200 pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(prev => !prev)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary focus:outline-none"
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
                   </div>
 
                   {error && (
@@ -106,6 +118,15 @@ export default function Login() {
                 </form>
               </div>
             </div>
+
+            {/* Botón de cambio de tema */}
+            <button
+              onClick={toggleTheme}
+              className="absolute top-10 right-10 p-4 rounded-full bg-background/50 hover:bg-background text-text-secondary hover:text-text-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-light z-50"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
           </div>
         </div>
       </div>
