@@ -1,5 +1,5 @@
 import { PieChart, Mail, Zap, Target, Lightbulb } from 'lucide-react';
-import { NavigationItem } from '../../shared/types/navigation';
+import { NavigationItem } from '../../shared/interface/navigation';
 
 export const marketingRoutes: NavigationItem = {
   name: 'Marketing',

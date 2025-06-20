@@ -35,7 +35,7 @@ const ProductoDetalle: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            to="/productos"
+            to="/inventario"
             className="p-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-lg transition-colors duration-200"
           >
             <ArrowLeftIcon className="h-5 w-5" />
@@ -46,7 +46,7 @@ const ProductoDetalle: React.FC = () => {
           </div>
         </div>
         <Link
-          to={`/productos/${product.id}/editar`}
+          to={`/inventario/${product.id}/editar`}
           className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           <PencilIcon className="h-5 w-5" />
@@ -110,7 +110,7 @@ const ProductoDetalle: React.FC = () => {
           </div>
 
           <Link
-            to={`/productos/${product.id}/editar`}
+            to={`/inventario/${product.id}/editar`}
             className="w-full bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl text-lg font-medium"
           >
             <PencilIcon className="h-6 w-6" />

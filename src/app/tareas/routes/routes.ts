@@ -1,5 +1,5 @@
 import { PieChart, ClipboardList, Calendar } from "lucide-react";
-import { NavigationItem } from "../../shared/types/navigation";
+import { NavigationItem } from "../../shared/interface/navigation";
 
 export const tareasRoutes: NavigationItem = {
   name: "Gestión de Tareas",

@@ -123,7 +123,7 @@ const ProductosList: React.FC = () => {
           <p className="text-text-secondary mt-1">Gestiona tu catálogo de productos</p>
         </div>
         <Link
-          to="/productos/nuevo"
+          to="/inventario/nuevo"
           className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           <PlusIcon className="h-5 w-5" />
@@ -173,7 +173,7 @@ const ProductosList: React.FC = () => {
             <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
               <span className="text-xl font-semibold text-text-primary">{product.price}</span>
               <Link
-                to={`/productos/${product.id}`}
+                to={`/inventario/${product.id}`}
                 className="bg-background hover:bg-orange-primary/10 text-text-secondary hover:text-orange-primary px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >
                 Ver Detalle

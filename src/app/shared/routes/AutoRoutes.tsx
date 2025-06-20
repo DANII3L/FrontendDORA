@@ -1,70 +1,80 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
+import { IRouteProps } from '../interface/IRouteProps';
+import { IModuleInfo } from '../interface/IModuleInfo';
 
-// Importa todos los archivos que terminen en routes.tsx dentro de src/app
-const modules = import.meta.glob('../../**/routes/routes.tsx', { eager: true });
+// Función para crear una ruta con key única
+const createRoute = (path: string, element: React.ReactElement, key: string): React.ReactElement => {
+  return React.createElement(Route, { key, path, element });
+};
 
-// Función para convertir rutas anidadas a rutas planas
-const flattenRoutes = (routeElement: React.ReactElement): React.ReactElement[] => {
+// Función para procesar rutas anidadas
+const processNestedRoutes = (routeElement: React.ReactElement): React.ReactElement[] => {
   const routes: React.ReactElement[] = [];
+  const parentPath = routeElement.props.path;
   
-  if (routeElement.props.children) {
-    // Si tiene children, crear rutas planas
-    const parentPath = routeElement.props.path;
-    const children = Array.isArray(routeElement.props.children) 
-      ? routeElement.props.children 
-      : [routeElement.props.children];
+  if (!parentPath) return routes;
+
+  const children = Array.isArray(routeElement.props.children) 
+    ? routeElement.props.children 
+    : [routeElement.props.children];
+
+  children.forEach((child: React.ReactElement) => {
+    if (!React.isValidElement(child) || child.type !== Route) return;
+
+    const childProps = child.props as IRouteProps;
     
-    children.forEach((child: React.ReactElement) => {
-      if (child.props.index) {
-        // Ruta index
-        routes.push(
-          <Route 
-            key={`${parentPath}-index`}
-            path={parentPath} 
-            element={child.props.element} 
-          />
-        );
-      } else {
-        // Ruta con path
-        const childPath = child.props.path;
-        const fullPath = childPath.startsWith('/') 
-          ? childPath 
-          : `${parentPath}/${childPath}`;
-        
-        routes.push(
-          <Route 
-            key={`${parentPath}-${childPath}`}
-            path={fullPath} 
-            element={child.props.element} 
-          />
-        );
-      }
-    });
-  } else {
-    // Ruta simple sin children
-    routes.push(routeElement);
-  }
-  
+    if (childProps.index && childProps.element) {
+      routes.push(createRoute(parentPath, childProps.element, `${parentPath}-index`));
+    } else if (childProps.path && childProps.element) {
+      const fullPath = childProps.path.startsWith('/') 
+        ? childProps.path 
+        : `${parentPath}/${childProps.path}`;
+      
+      routes.push(createRoute(fullPath, childProps.element, `${parentPath}-${childProps.path}`));
+    }
+  });
+
   return routes;
 };
 
-// Procesar los módulos y extraer las rutas
-const routeElements = Object.values(modules)
-  .map((mod) => {
+// Función principal para aplanar rutas
+const flattenRoutes = (routeElement: React.ReactElement): React.ReactElement[] => {
+  if (routeElement.type !== Route) return [];
+
+  const props = routeElement.props as IRouteProps;
+
+  // Todas las rutas ahora son anidadas o simples
+  if (props.children) {
+    return processNestedRoutes(routeElement);
+  }
+
+  // Rutas simples
+  return [routeElement];
+};
+
+// Importar módulos de rutas
+const modules = import.meta.glob('../../**/routes/routes.tsx', { eager: true });
+
+// Procesar y extraer todas las rutas
+const routeElements = Object.entries(modules)
+  .map(([path, mod]): IModuleInfo | null => {
     const element = (mod as { default: React.ReactElement }).default;
-    if (React.isValidElement(element) && element.type === Route) {
-      return flattenRoutes(element);
-    }
-    return null;
+    return React.isValidElement(element) && element.type === Route 
+      ? { path, element } 
+      : null;
   })
-  .filter(Boolean)
-  .flat();
+  .filter((module): module is IModuleInfo => module !== null)
+  .flatMap(({ element }) => flattenRoutes(element))
+  .filter((route): route is React.ReactElement => 
+    React.isValidElement(route) && route.type === Route && route.key !== null
+  );
 
-console.log('Rutas procesadas:', routeElements);
+export { routeElements };
 
-export const AutoRoutes = () => (
-  <React.Fragment>
-    {routeElements}
-  </React.Fragment>
-);
+// Componente para renderizar rutas (mantenido por compatibilidad)
+export const AutoRoutes = () => {
+  return routeElements.map((route, index) =>
+    React.cloneElement(route, { key: route.key || `route-${index}` })
+  );
+};

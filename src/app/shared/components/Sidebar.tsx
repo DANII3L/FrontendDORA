@@ -4,26 +4,28 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
-import { navigation } from '../routes'; // Importa la navegación centralizada
-import { NavigationItem, NavigationChild } from '../types/navigation'; // Asegúrate de que estos tipos existan y sean correctos
+import { NavigationItem, NavigationChild } from '../interface/navigation';
 
 interface SidebarProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  navigation: NavigationItem[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ open, setOpen, navigation }) => {
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
-  const isActive = (path: string) => {
-    // Original logic for active path
-    return location.pathname === path;
-  };
+  // Ordenar: primero los que NO tienen hijos, luego los que SÍ tienen hijos
+  const orderedNavigation = [...navigation].sort((a, b) => {
+    if (!a.children && b.children) return -1;
+    if (a.children && !b.children) return 1;
+    return 0;
+  });
 
-  const isChildActive = (children?: NavigationChild[]) => {
-    if (!children) return false;
-    return children.some(child => isActive(child.href));
+  const isParentActive = (path: string) => {
+    if (path === '/') return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   const toggleSubmenu = (name: string) => {
@@ -31,14 +33,82 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
   };
 
   useEffect(() => {
-    navigation.forEach(item => {
-      if (item.children && isChildActive(item.children)) {
-        setOpenSubmenu(item.name);
-      }
-    });
+    const activeParent = orderedNavigation.find(item => item.children && isParentActive(item.href));
+    if (activeParent) setOpenSubmenu(activeParent.name);
   }, [location.pathname]);
 
-  // Nota: La lógica para expandir automáticamente los submenús si un hijo está activo no estaba presente en tu última versión, la he omitido para mantener el código como lo proporcionaste. Si la necesitas, házmelo saber.
+  // COMPONENTES AUXILIARES
+  const SidebarLink = ({ item, onClick }: { item: NavigationItem | NavigationChild, onClick?: () => void }) => (
+    <Link
+      to={item.href}
+      className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
+        location.pathname === item.href
+          ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
+          : 'text-text-secondary hover:text-text-primary hover:bg-background'
+      }`}
+      onClick={onClick}
+    >
+      {item.icon && <item.icon className="h-6 w-6 shrink-0" />}
+      {item.name}
+    </Link>
+  );
+
+  const SidebarParentButton = ({ item }: { item: NavigationItem }) => (
+    <button
+      type="button"
+      onClick={() => toggleSubmenu(item.name)}
+      className={`group flex w-full items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
+        isParentActive(item.href)
+          ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
+          : 'text-text-secondary hover:text-text-primary hover:bg-background'
+      }`}
+    >
+      <item.icon className="h-6 w-6 shrink-0" />
+      {item.name}
+      <ChevronRight className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu === item.name ? 'rotate-90' : ''}`} />
+    </button>
+  );
+
+  const SidebarSubmenu = ({ item, onClick }: { item: NavigationItem, onClick?: () => void }) => (
+    openSubmenu === item.name && (
+      <ul className="ml-6 mt-1 space-y-1">
+        {item.children!.map((subItem: NavigationChild) => (
+          <li key={subItem.name}>
+            <Link
+              to={subItem.href}
+              className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
+                location.pathname === subItem.href
+                  ? 'text-orange-primary'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-background'
+              }`}
+              onClick={onClick}
+            >
+              {subItem.icon && <subItem.icon className="h-5 w-5 shrink-0" />}
+              {subItem.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    )
+  );
+
+  // RENDER DE LA LISTA DE NAVEGACIÓN (reutilizable para mobile y desktop)
+  const renderNavigation = (onLinkClick?: () => void) => (
+    <ul className="-mx-2 space-y-1">
+      {orderedNavigation.map((item: NavigationItem) => (
+        <li key={item.name}>
+          {item.children ? (
+            <>
+              <SidebarParentButton item={item} />
+              <SidebarSubmenu item={item} onClick={onLinkClick} />
+            </>
+          ) : (
+            <SidebarLink item={item} onClick={onLinkClick} />
+          )}
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <>
@@ -63,68 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           </div>
           <nav className="flex flex-1 flex-col px-6 pb-4">
             <ul className="flex flex-1 flex-col gap-y-7">
-              <li>
-                <ul className="-mx-2 space-y-1">
-                  {navigation.map((item: NavigationItem) => (
-                    <li key={item.name}>
-                      {item.children ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => toggleSubmenu(item.name)}
-                            className={`group flex w-full items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                              location.pathname.startsWith(item.href)
-                                ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
-                                : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                            }`}
-                          >
-                            <item.icon className="h-6 w-6 shrink-0" />
-                            {item.name}
-                            <ChevronRight
-                              className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu === item.name ? 'rotate-90' : ''}`}
-                            />
-                          </button>
-                          {
-                            openSubmenu === item.name && (
-                              <ul className="ml-6 mt-1 space-y-1">
-                                {item.children.map((subItem: NavigationChild) => (
-                                  <li key={subItem.name}>
-                                    <Link
-                                      to={subItem.href}
-                                      className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                                        location.pathname === subItem.href
-                                          ? 'text-orange-primary'
-                                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                                      }`}
-                                      onClick={() => setOpen(false)}
-                                    >
-                                      {subItem.icon && <subItem.icon className="h-5 w-5 shrink-0" />}
-                                      {subItem.name}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            )
-                          }
-                        </>
-                      ) : (
-                        <Link
-                          to={item.href}
-                          className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                            location.pathname === item.href
-                              ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
-                              : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                          }`}
-                          onClick={() => setOpen(false)}
-                        >
-                          <item.icon className="h-6 w-6 shrink-0" />
-                          {item.name}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </li>
+              <li>{renderNavigation(() => setOpen(false))}</li>
             </ul>
           </nav>
         </div>
@@ -141,66 +150,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-7">
-              <li>
-                <ul className="-mx-2 space-y-1">
-                  {navigation.map((item: NavigationItem) => (
-                    <li key={item.name}>
-                      {item.children ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => toggleSubmenu(item.name)}
-                            className={`group flex w-full items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-all duration-200 ${
-                              location.pathname.startsWith(item.href)
-                                ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
-                                : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                            }`}
-                          >
-                            <item.icon className="h-6 w-6 shrink-0" />
-                            {item.name}
-                            <ChevronRight
-                              className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu === item.name ? 'rotate-90' : ''}`}
-                            />
-                          </button>
-                          {
-                            openSubmenu === item.name && (
-                              <ul className="ml-6 mt-1 space-y-1">
-                                {item.children.map((subItem: NavigationChild) => (
-                                  <li key={subItem.name}>
-                                    <Link
-                                      to={subItem.href}
-                                      className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                                        location.pathname === subItem.href
-                                          ? 'text-orange-primary'
-                                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                                      }`}
-                                    >
-                                      {subItem.icon && <subItem.icon className="h-5 w-5 shrink-0" />}
-                                      {subItem.name}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            )
-                          }
-                        </>
-                      ) : (
-                        <Link
-                          to={item.href}
-                          className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                            location.pathname === item.href
-                              ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-sm hover:from-orange-600 hover:to-red-600'
-                              : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                          }`}
-                        >
-                          <item.icon className="h-6 w-6 shrink-0" />
-                          {item.name}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </li>
+              <li>{renderNavigation()}</li>
             </ul>
           </nav>
         </div>

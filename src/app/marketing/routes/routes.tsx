@@ -9,6 +9,5 @@ export default (
     <Route path="ideas-marketing" element={<MarketingIdeas />} />
     <Route path="nueva" element={<MarketingIdeaForm />} />
     <Route path=":id/editar" element={<MarketingIdeaForm />} />
-    {/*<Route path="reportes" element={< MarketingReportes />} />*/}  
   </Route>
 );

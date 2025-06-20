@@ -3,10 +3,10 @@ import { AuthProvider } from './app/auth/AuthContext';
 import { ThemeProvider } from './app/shared/contexts/ThemeContext';
 import Layout from './app/shared/components/Layout';
 import Login from './app/auth/components/Login';
-import { AutoRoutes } from './app/shared/routes/AutoRoutes.tsx';
+import { routeElements } from './app/shared/routes/AutoRoutes.tsx';
 
 // Componentes de Seguridad
-import ProtectedRoute from './app/core/guards/ProtectedRoute';
+import ProtectedRoute from './app/shared/core/guards/ProtectedRoute';
 
 function App() {
   return (
@@ -22,8 +22,8 @@ function App() {
               {/* Redirección por defecto */}
               <Route index element={<Navigate to="/dashboard" replace />} />
               
-              {/* Función dinamica para busqueda de los archivos routes */}
-              <AutoRoutes />
+              {/* Rutas dinámicas */}
+              {routeElements}
               
             </Route>
           </Routes>

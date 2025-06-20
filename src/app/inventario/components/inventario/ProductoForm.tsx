@@ -61,7 +61,7 @@ const ProductoForm: React.FC = () => {
     console.log('Producto a guardar/actualizar:', productData);
 
     // Después de guardar, navegar de vuelta a la lista de productos o al detalle del producto
-    navigate('/productos');
+    navigate('/inventario');
   };
 
   return (
@@ -70,7 +70,7 @@ const ProductoForm: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            to="/productos"
+            to="/inventario"
             className="p-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-lg transition-colors duration-200"
           >
             <ArrowLeftIcon className="h-5 w-5" />

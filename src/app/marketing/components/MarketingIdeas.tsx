@@ -171,7 +171,7 @@ const MarketingIdeas: React.FC = () => {
                 idea.associatedProducts.map(product => (
                   <Link
                     key={product.id}
-                    to={`/productos/${product.id}`}
+                    to={`/inventario/${product.id}`}
                     className="flex items-center space-x-1 px-2 py-1 bg-accent-light rounded-full text-xs font-medium text-text-primary hover:bg-orange-primary/20 transition-colors duration-200"
                   >
                     <TagIcon className="h-4 w-4" />

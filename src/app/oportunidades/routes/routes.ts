@@ -1,5 +1,5 @@
 import { PieChart, Briefcase, Kanban } from "lucide-react";
-import { NavigationItem } from "../../shared/types/navigation";
+import { NavigationItem } from "../../shared/interface/navigation";
 
 export const oportunidadesRoutes: NavigationItem = {
   name: "Gestión Comercial",

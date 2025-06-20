@@ -1,5 +1,5 @@
 import { Cog, Zap, Database } from 'lucide-react';
-import { NavigationItem } from '../../shared/types/navigation';
+import { NavigationItem } from '../../shared/interface/navigation';
 
 export const configuracionRoutes: NavigationItem = {
   name: 'Configuración',

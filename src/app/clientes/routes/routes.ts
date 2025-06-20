@@ -1,5 +1,5 @@
 import { Building2, PieChart } from 'lucide-react';
-import { NavigationItem } from '../../shared/types/navigation';
+import { NavigationItem } from '../../shared/interface/navigation';
 
 export const clientesRoutes: NavigationItem = {
   name: 'Gestión de Clientes',
