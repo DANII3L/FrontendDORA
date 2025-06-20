@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import {
   BarChart3,
-  Package,
   TrendingUp,
   DollarSign,
   ShoppingCart,
-  Activity,
   Star,
-  Tag,
   Percent,
 } from 'lucide-react';
 

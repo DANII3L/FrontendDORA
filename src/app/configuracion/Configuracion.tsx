@@ -1,39 +1,63 @@
-import React from 'react';
-import { User, Bell, Shield, Database, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Bell, Shield, Database, Mail, Zap } from 'lucide-react';
+import Automatizaciones from './components/automatizaciones/Automatizaciones';
 
 const Configuracion: React.FC = () => {
+  const [vista, setVista] = useState<'menu' | 'automatizaciones'>('menu');
+
   const configuraciones = [
     {
       titulo: 'Perfil de Usuario',
       descripcion: 'Gestiona tu información personal y preferencias',
       icono: User,
       color: 'text-blue-500',
+      onClick: null,
     },
     {
       titulo: 'Notificaciones',
       descripcion: 'Configura las alertas y notificaciones del sistema',
       icono: Bell,
       color: 'text-orange-500',
+      onClick: null,
     },
     {
       titulo: 'Seguridad',
       descripcion: 'Administra contraseñas y permisos de acceso',
       icono: Shield,
       color: 'text-red-500',
+      onClick: null,
     },
     {
       titulo: 'Base de Datos',
       descripcion: 'Configura la conexión y respaldos de datos',
       icono: Database,
       color: 'text-green-500',
+      onClick: null,
     },
     {
       titulo: 'Correo Electrónico',
       descripcion: 'Configura el servidor de correo y plantillas',
       icono: Mail,
       color: 'text-purple-500',
+      onClick: null,
+    },
+    {
+      titulo: 'Automatizaciones',
+      descripcion: 'Crea reglas automáticas para tu CRM',
+      icono: Zap,
+      color: 'text-yellow-500',
+      onClick: () => setVista('automatizaciones'),
     },
   ];
+
+  if (vista === 'automatizaciones') {
+    return (
+      <div>
+        <button onClick={() => setVista('menu')} className="mb-4 text-blue-600 hover:underline">← Volver</button>
+        <Automatizaciones />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -49,6 +73,7 @@ const Configuracion: React.FC = () => {
           <div
             key={index}
             className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border hover:border-text-secondary transition-all duration-300 cursor-pointer"
+            onClick={config.onClick || undefined}
           >
             <div className="flex items-center space-x-4">
               <div className={`p-3 rounded-xl ${config.color} bg-opacity-10`}>

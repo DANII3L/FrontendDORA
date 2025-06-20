@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeftIcon, ShoppingCartIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PencilIcon } from '@heroicons/react/24/outline';
 
 const ProductoDetalle: React.FC = () => {
   const { id } = useParams();

@@ -8,7 +8,7 @@ import {
   CalendarIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
-import Pagination from '../../shared/components/Pagination';
+import Pagination from '../../../shared/components/Pagination';
 
 const TicketsList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

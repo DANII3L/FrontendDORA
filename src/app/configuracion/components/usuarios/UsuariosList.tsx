@@ -6,7 +6,7 @@ import {
   FunnelIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import Pagination from '../../shared/components/Pagination';
+import Pagination from '../../../shared/components/Pagination';
 
 const UsuariosList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

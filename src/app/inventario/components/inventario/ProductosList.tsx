@@ -5,11 +5,10 @@ import {
   MagnifyingGlassIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline';
-import Pagination from '../../shared/components/Pagination';
+import Pagination from '../../../shared/components/Pagination';
 
 const ProductosList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('todas'); // Puedes definir filtros específicos para productos
   const [selectedCategory, setSelectedCategory] = useState('todas');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6); // Estado para ítems por página

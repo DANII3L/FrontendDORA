@@ -6,7 +6,7 @@ export const clientesRoutes: NavigationItem = {
   href: '/clientes',
   icon: Building2,
   children: [
-    { name: 'Lista de Clientes', href: '/clientes/ClientesLista' },
+    { name: 'Lista de Clientes', href: '/clientes/' },
     { name: 'Segmentación', href: '/clientes/ClientesSegmentacion' },
     { name: 'Pipeline', href: '/clientes/ClientesPipeline' },
     { name: 'Historial', href: '/clientes/ClientesHistorial' },
