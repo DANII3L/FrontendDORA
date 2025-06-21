@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { User, Bell, Shield, Database, Mail, Zap } from 'lucide-react';
-import Automatizaciones from './components/automatizaciones/Automatizaciones';
+import Automatizaciones from '../automatizaciones/Automatizaciones';
+import DatabaseQuery from '../database/DatabaseQuery';
+import EmailConfig from '../email/EmailConfig';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 const Configuracion: React.FC = () => {
-  const [vista, setVista] = useState<'menu' | 'automatizaciones'>('menu');
+  const [vista, setVista] = useState<'menu' | 'automatizaciones' | 'data-base' | 'email'>('menu');
 
   const configuraciones = [
     {
@@ -32,14 +35,14 @@ const Configuracion: React.FC = () => {
       descripcion: 'Configura la conexión y respaldos de datos',
       icono: Database,
       color: 'text-green-500',
-      onClick: null,
+      onClick: () => setVista('data-base'),
     },
     {
       titulo: 'Correo Electrónico',
       descripcion: 'Configura el servidor de correo y plantillas',
       icono: Mail,
       color: 'text-purple-500',
-      onClick: null,
+      onClick: () => setVista('email'),
     },
     {
       titulo: 'Automatizaciones',
@@ -50,11 +53,20 @@ const Configuracion: React.FC = () => {
     },
   ];
 
-  if (vista === 'automatizaciones') {
+  if (vista !== 'menu') {
     return (
       <div>
-        <button onClick={() => setVista('menu')} className="mb-4 text-blue-600 hover:underline">← Volver</button>
-        <Automatizaciones />
+        <button
+          onClick={() => setVista('menu')}
+          className="flex items-center gap-2 mb-4 p-2 text-text-secondary hover:text-text-primary hover:bg-background rounded-lg transition-colors duration-200"
+        >
+          <ArrowLeftIcon className="h-5 w-5" />
+          <span>Volver</span>
+        </button>
+        
+        {vista === 'automatizaciones' && <Automatizaciones />}
+        {vista === 'data-base' && <DatabaseQuery />}
+        {vista === 'email' && <EmailConfig />}
       </div>
     );
   }

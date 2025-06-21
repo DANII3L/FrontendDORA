@@ -6,7 +6,8 @@ export const configuracionRoutes: NavigationItem = {
   href: '/configuracion',
   icon: Cog,
   children: [
-    { name: 'Ajustes Generales', href: '/configuracion' },
+    { name: 'Pantalla Inicial', href: '/configuracion' },
+    { name: 'Ajustes Generales', href: '/configuracion/ajustes-generales' },
     { name: 'Usuarios', href: '/configuracion/usuarios' },
     { name: 'Roles', href: '/configuracion/roles' },
     { name: 'Integraciones', href: '/configuracion/integraciones' },

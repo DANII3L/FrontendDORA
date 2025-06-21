@@ -3,4 +3,6 @@ export interface IRouteProps {
     path?: string;
     element?: React.ReactElement;
     children?: React.ReactElement | React.ReactElement[];
+    name?: string;
+    isPrivate?: boolean;
 }

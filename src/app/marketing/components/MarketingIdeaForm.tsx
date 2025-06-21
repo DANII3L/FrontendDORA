@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, CheckIcon } from '@heroicons/react/24/outline';
+import DynamicForm from '../../shared/components/ui/DynamicForm';
+import { IFieldConfig } from '../../shared/interface/IFieldConfig';
 
 const MarketingIdeaForm: React.FC = () => {
   const { id } = useParams();
@@ -68,25 +70,37 @@ const MarketingIdeaForm: React.FC = () => {
     }
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (values: Record<string, any>) => {
     // Aquí se manejaría la lógica para guardar o actualizar la idea de marketing
     const ideaData = {
-      id: id ? parseInt(id) : Date.now(), // For new ideas, generate a temporary ID
-      title,
-      description,
-      associatedProducts: associatedProducts.split(', ').map(name => {
+      id: id ? parseInt(id) : Date.now(),
+      title: values.title,
+      description: values.description,
+      associatedProducts: values.associatedProducts.split(', ').map((name: string) => {
         const product = allProducts.find(p => p.name === name.trim());
-        return product ? { id: product.id, name: product.name } : { id: Date.now(), name: name.trim() }; // Create dummy ID if product not found
+        return product ? { id: product.id, name: product.name } : { id: Date.now(), name: name.trim() };
       }),
-      status,
-      date,
+      status: values.status,
+      date: values.date,
     };
     console.log('Idea de marketing a guardar/actualizar:', ideaData);
-
-    // After saving, navigate back to the marketing ideas list
     navigate('/marketing');
   };
+
+  const fields: IFieldConfig[] = [
+    { name: 'title', label: 'Título', type: 'text', required: true },
+    { name: 'description', label: 'Descripción', type: 'textarea', required: true },
+    { name: 'associatedProducts', label: 'Productos Asociados (nombres separados por comas)', type: 'text' },
+    { name: 'status', label: 'Estado', type: 'select', required: true, options: [
+      { value: 'Activa', label: 'Activa' },
+      { value: 'Pendiente', label: 'Pendiente' },
+      { value: 'En Progreso', label: 'En Progreso' },
+      { value: 'Completada', label: 'Completada' },
+      { value: 'Cancelada', label: 'Cancelada' }
+    ] },
+    { name: 'date', label: 'Fecha', type: 'text' }
+  ];
+  const initialValues = { title, description, associatedProducts, status, date };
 
   return (
     <div className="space-y-6">
@@ -108,86 +122,22 @@ const MarketingIdeaForm: React.FC = () => {
 
       {/* Marketing Idea Form */}
       <div className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Título */}
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-text-secondary mb-1">Título</label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-              required
-            />
-          </div>
-
-          {/* Descripción */}
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-text-secondary mb-1">Descripción</label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-              required
-            ></textarea>
-          </div>
-
-          {/* Productos Asociados (ejemplo: lista de IDs o nombres separados por comas) */}
-          <div>
-            <label htmlFor="associatedProducts" className="block text-sm font-medium text-text-secondary mb-1">Productos Asociados (nombres separados por comas)</label>
-            <input
-              type="text"
-              id="associatedProducts"
-              value={associatedProducts}
-              onChange={(e) => setAssociatedProducts(e.target.value)}
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-            />
-            <p className="mt-1 text-xs text-text-tertiary">Ej: Pocket Tester (for vegetables), Smart Thermometer</p>
-          </div>
-
-          {/* Estado */}
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium text-text-secondary mb-1">Estado</label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-              required
+        <DynamicForm
+          fields={fields}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          submitText={id ? "Actualizar Idea de Marketing" : "Guardar Idea de Marketing"}
+          className="space-y-6"
+          renderSubmitButton={({ submitText }) => (
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-lg"
             >
-              <option value="">Selecciona un estado</option>
-              <option value="Activa">Activa</option>
-              <option value="Pendiente">Pendiente</option>
-              <option value="En Progreso">En Progreso</option>
-              <option value="Completada">Completada</option>
-              <option value="Cancelada">Cancelada</option>
-            </select>
-          </div>
-
-          {/* Fecha (puede ser un input type=date o autogenerado) */}
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-text-secondary mb-1">Fecha</label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-            />
-          </div>
-
-          {/* Botón de Guardar */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl text-lg font-medium"
-          >
-            <CheckIcon className="h-6 w-6" />
-            <span>Guardar Idea de Marketing</span>
-          </button>
-        </form>
+              <CheckIcon className="h-6 w-6" />
+              {submitText}
+            </button>
+          )}
+        />
       </div>
     </div>
   );

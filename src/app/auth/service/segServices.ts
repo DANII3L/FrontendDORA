@@ -2,7 +2,7 @@ import { apiService } from '../../shared/services/apiService';
 import { Usuario } from '../../configuracion/models/Usuarios';
 
 const login = async (usuario: Usuario) => {
-  await apiService.post('Usuarios', usuario);
+  await apiService.post('Seguridad/Login', usuario);
 };
 
 const register = async () => {
