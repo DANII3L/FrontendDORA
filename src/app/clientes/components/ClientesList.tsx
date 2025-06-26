@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DynamicCardList from '../../shared/components/ui/DynamicCardList';
-import { UserIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, PhoneIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 
 const mockClientes = [
   { id: 1, nombre: 'ABC Corporation', contacto: 'Juan Pérez', email: 'juan.perez@abc.com', telefono: '+1 (555) 123-4567', estado: 'activo', valor: '$125,000', ultimaActividad: '2024-01-15', industria: 'Tecnología' },

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../auth/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useCompany } from '../contexts/CompanyContext';
 import { 
   Menu,
   Search,
@@ -10,6 +11,7 @@ import {
   Moon,
   User
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   setSidebarOpen: (open: boolean) => void;
@@ -18,6 +20,19 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { company } = useCompany();
+  const navigate = useNavigate();
+  const [open, setOpen] = React.useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const handleProfile = () => {
+    setOpen(false);
+    navigate('/configuracion/perfil');
+  };
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-card-background/95 backdrop-blur px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -88,22 +103,49 @@ const Header: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
           {/* Separator */}
           <div className="hidden lg:block lg:h-6 lg:w-px bg-border" />
 
+          {/* Company Info */}
+          {company && (
+            <div className="hidden lg:flex items-center gap-x-2">
+              <div className="text-right">
+                <p className="text-sm font-semibold text-text-primary">{company.razonSocial}</p>
+                <p className="text-xs text-text-secondary">{company.identificacionFiscal}</p>
+              </div>
+              <div className="h-6 w-px bg-border" />
+            </div>
+          )}
+
           {/* Profile dropdown */}
           <div className="relative">
             <button
               type="button"
               className="flex items-center gap-x-2 text-sm leading-6 text-text-primary hover:bg-background rounded-lg px-3 py-2 transition-colors duration-200"
-              onClick={logout}
+              onClick={() => setOpen((v) => !v)}
             >
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-orange-primary to-red-primary flex items-center justify-center">
                 <User className="h-5 w-5 text-white" />
               </div>
               <span className="hidden lg:flex lg:items-center">
                 <span className="ml-2 text-sm font-semibold leading-6 text-text-primary">
-                  {user?.nombre} {user?.apellido}
+                  {user?.nombre} {user?.apellidos}
                 </span>
               </span>
             </button>
+            {open && (
+              <div className="absolute right-0 mt-2 w-44 bg-white border border-border rounded-xl shadow-lg z-50 py-2">
+                <button
+                  className="w-full text-left px-4 py-2 text-text-primary hover:bg-gray-100 transition-colors"
+                  onClick={handleProfile}
+                >
+                  Ver perfil
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition-colors"
+                  onClick={handleLogout}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

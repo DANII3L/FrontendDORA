@@ -3,6 +3,7 @@ import { apiService } from '../../services/apiService';
 import { Card } from './Card';
 import Pagination from '../Pagination';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { useNotification } from '../../contexts/NotificationContext';
 
 interface CardField {
   label: string;
@@ -58,6 +59,8 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   const [filterValues, setFilterValues] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageOptions[0]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     if (mockData) {
@@ -66,20 +69,56 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
     }
     fetchData();
     // eslint-disable-next-line
-  }, [apiEndpoint, mockData]);
+  }, [apiEndpoint, mockData, search, filterValues, currentPage, itemsPerPage]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const params: any = {};
-      filters.forEach(f => {
-        if (f.type === 'search' && search) params[f.key] = search;
-        if (f.type === 'select' && filterValues[f.key]) params[f.key] = filterValues[f.key];
+      params.pageNumber = currentPage;
+      params.pageSize = itemsPerPage;
+
+      // Construir el parámetro Filter
+      const filterStrings: string[] = [];
+      Object.entries(filterValues).forEach(([key, value]) => {
+        if (value) filterStrings.push(`${key} = '${value}'`);
       });
+      const filterParam = filterStrings.join(', ');
+      if (filterParam) {
+        params.Filter = 'AND ' + filterParam;
+      }
+
       const res = await apiService.get(apiEndpoint, params);
-      setData(Array.isArray(res.data) ? res.data : []);
-    } catch (e) {
+      const list = res?.data?.listFind;
+      const total =
+        res && 'totalRecords' in res && typeof res.totalRecords === 'number'
+          ? res.totalRecords
+          : Array.isArray(list)
+          ? list.length
+          : 0;
+
+      if (Array.isArray(list)) {
+        setData(list);
+        setTotalRecords(total);
+        if (total === 0) {
+          addNotification('No se encontraron registros', 'info');
+        }
+      } else if (res && res.message) {
+        const isSuccess = res.status >= 200 && res.status < 300;
+        addNotification(res.message, isSuccess ? 'success' : 'error');
+        setData([]);
+        setTotalRecords(0);
+      } else {
+        setData([]);
+        setTotalRecords(0);
+        addNotification('Respuesta vacía del servidor', 'error');
+      }
+    } catch (e: any) {
+      console.error('API Error:', e);
       setData([]);
+      setTotalRecords(0);
+      const errorMessage = e?.response?.data?.message || e?.message || 'Error al cargar los datos';
+      addNotification(errorMessage, 'error');
     }
     setLoading(false);
   };
@@ -91,15 +130,6 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   const handleSelect = (key: string, value: string) => {
     setFilterValues(prev => ({ ...prev, [key]: value }));
   };
-
-  useEffect(() => {
-    if (mockData) {
-      setData(mockData);
-      return;
-    }
-    fetchData();
-    // eslint-disable-next-line
-  }, [search, filterValues, mockData]);
 
   // Filtrado local para mockData
   let filteredData = data;
@@ -123,7 +153,7 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = pagination ? filteredData.slice(indexOfFirstItem, indexOfLastItem) : filteredData;
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(totalRecords / itemsPerPage);
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -153,48 +183,62 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
           ))}
         </div>
       )}
+
       {/* Filtros */}
       {filters.length > 0 && (
-        <div className="bg-card-background p-4 rounded-xl border border-border flex flex-col sm:flex-row gap-4">
-          {filters.map((filter) => {
-            if (filter.type === 'search') {
-              return (
-                <input
-                  key={filter.key}
-                  type="text"
-                  placeholder={filter.placeholder || 'Buscar...'}
-                  value={search}
-                  onChange={handleSearch}
-                  className="w-full sm:w-64 px-3 py-2 border rounded-lg"
-                />
-              );
-            }
-            if (filter.type === 'select') {
-              return (
-                <select
-                  key={filter.key}
-                  value={filterValues[filter.key] || ''}
-                  onChange={e => handleSelect(filter.key, e.target.value)}
-                  className="w-full sm:w-48 px-3 py-2 border rounded-lg"
-                >
-                  <option value="">{filter.placeholder || 'Todos'}</option>
-                  {filter.options?.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              );
-            }
-            return null;
-          })}
+        <div className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {filters.map((filter) => {
+              if (filter.type === 'search') {
+                return (
+                  <div key={filter.key} className="flex-1 relative">
+                    <input
+                      type="text"
+                      placeholder={filter.placeholder || 'Buscar...'}
+                      value={search}
+                      onChange={handleSearch}
+                      className="w-full pl-4 pr-4 py-2 bg-background border border-border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
+                    />
+                  </div>
+                );
+              }
+              if (filter.type === 'select') {
+                return (
+                  <div key={filter.key} className="flex items-center space-x-2">
+                    <select
+                      value={filterValues[filter.key] || ''}
+                      onChange={e => handleSelect(filter.key, e.target.value)}
+                      className="bg-background border border-border rounded-lg text-text-primary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
+                    >
+                      <option value="">{filter.placeholder || 'Todos'}</option>
+                      {filter.options?.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
         </div>
       )}
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          <div className="col-span-full text-center py-12">Cargando...</div>
+          <div className="col-span-full text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-primary mx-auto"></div>
+            <p className="mt-2 text-text-secondary">Cargando...</p>
+          </div>
         ) : currentItems.length === 0 ? (
-          <div className="col-span-full text-center py-12">No se encontraron registros</div>
+          <div className="col-span-full text-center py-12">
+            <div className="text-text-secondary text-6xl mb-4">📋</div>
+            <h3 className="text-lg font-medium text-text-primary">No se encontraron registros</h3>
+            <p className="text-text-secondary mt-1">
+              {search || Object.values(filterValues).some(v => v) ? 'Intenta con otros filtros' : 'Comienza agregando un nuevo registro'}
+            </p>
+          </div>
         ) : (
           currentItems.map((item, idx) => (
             renderCard ? (
@@ -225,6 +269,13 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
           itemsPerPage={itemsPerPage}
           onItemsPerPageChange={setItemsPerPage}
         />
+      )}
+
+      {/* Info de paginación */}
+      {pagination && totalRecords > 0 && (
+        <div className="flex justify-end text-sm text-text-secondary">
+          Mostrando página {currentPage} de {totalPages} | Total de registros: {totalRecords}
+        </div>
       )}
     </div>
   );

@@ -68,8 +68,8 @@ const DatabaseQuery: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1200));
       const mockResponse = {
         data: [
-          { id: 1, name: 'Usuario Ejemplo 1', email: 'user1@example.com', role: 'admin' },
-          { id: 2, name: 'Usuario Ejemplo 2', email: 'user2@example.com', role: 'user' },
+          { id: 1, name: 'Usuario Ejemplo 1', email: 'user1@example.com', rol: 'admin' },
+          { id: 2, name: 'Usuario Ejemplo 2', email: 'user2@example.com', rol: 'user' },
         ],
         message: `Resultados para la consulta: ${query.substring(0, 30)}...`
       };

@@ -7,6 +7,7 @@ import Roles from '../components/roles/Roles';
 import UsuariosList from '../components/usuarios/UsuariosList';
 import UsuarioForm from '../components/usuarios/UsuarioForm';
 import DatabaseQuery from '../components/database/DatabaseQuery'
+import Perfil from '../components/perfil/Perfil';
 
 export default (
   <Route path="configuracion">
@@ -18,5 +19,6 @@ export default (
     <Route path="usuarios" element={<UsuariosList />} />
     <Route path="usuarios/nuevo" element={<UsuarioForm />} />
     <Route path="usuarios/:id/editar" element={<UsuarioForm />} />
+    <Route path="perfil" element={<Perfil />} />
   </Route>
 );

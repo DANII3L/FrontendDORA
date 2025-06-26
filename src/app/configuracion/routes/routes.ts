@@ -13,6 +13,6 @@ export const configuracionRoutes: NavigationItem = {
     { name: 'Integraciones', href: '/configuracion/integraciones' },
     { name: 'Backup', href: '/configuracion/backup', icon: Database },
     { name: 'Logs', href: '/configuracion/logs' },
-    { name: 'Automatizaciones', href: '/configuracion/automatizaciones', icon: Zap },
+    { name: 'Automatizaciones', href: '/configuracion/automatizaciones', icon: Zap }
   ]
 };
