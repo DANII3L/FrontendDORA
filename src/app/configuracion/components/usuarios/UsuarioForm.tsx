@@ -1,17 +1,177 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import DynamicForm from '../../../shared/components/ui/DynamicForm';
+import { IFieldConfig } from '../../../shared/interface/IFieldConfig';
+import { useNotification } from '../../../shared/contexts/NotificationContext';
+import { useCompany } from '../../../shared/contexts/CompanyContext';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { createUser, getUserById, updateUser } from '../../service/configuracionService';
 
 const UsuarioForm: React.FC = () => {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-text-primary">Formulario de Usuario</h1>
-      </div>
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [formValues, setFormValues] = useState({
+        Nombre: '',
+        Apellidos: '',
+        Identificacion: '',
+        Correo: '',
+        Telefono: '',
+        Password: '',
+        Rol: '2'
+    });
+    const { entidadId } = useParams<{ entidadId?: string }>();
+    const navigate = useNavigate();
+    const { addNotification } = useNotification();
+    const { company } = useCompany();
 
-      <div className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border">
-        <p className="text-text-primary">Formulario de usuario en desarrollo...</p>
-      </div>
-    </div>
-  );
+    const fields: IFieldConfig[] = [
+        { name: 'Nombre', label: 'Nombre', type: 'text', required: true, colSpan: 1, maxLength: 20 },
+        { name: 'Apellidos', label: 'Apellidos', type: 'text', required: true, colSpan: 1 },
+        { name: 'Identificacion', label: 'Identificación', type: 'number', required: true, colSpan: 2, maxLength: 20 },
+        { name: 'Correo', label: 'Correo Electrónico', type: 'email', required: true, colSpan: 2 },
+        { name: 'Telefono', label: 'Teléfono', type: 'number', required: true, colSpan: 1 },
+        { name: 'Rol', label: 'Rol', type: 'select', required: true, colSpan: 1, options: [
+            { value: '1', label: 'Administrador' },
+            { value: '2', label: 'Usuario' },
+            { value: '3', label: 'Editor' }
+        ]},
+        { name: 'Password', label: 'Contraseña', type: 'password', required: true, colSpan: 2, minLength: 6, maxLength: 30 },
+    ];
+
+    React.useEffect(() => {
+        if (entidadId) {
+            setIsEditMode(true);
+            setIsLoading(true);
+            getUserById(entidadId)
+                .then((user) => {
+                    if (user) {
+                        setFormValues({
+                            Nombre: user.data.Nombre || '',
+                            Apellidos: user.data.Apellidos || '',
+                            Identificacion: user.data.Identificacion || '',
+                            Correo: user.data.Correo || '',
+                            Telefono: user.data.Telefono || '',
+                            Password: '', // No se muestra la contraseña actual
+                            Rol: user.data.Rol ? String(user.data.Rol) : '2',
+                        });
+                    } else {
+                        addNotification('Usuario no encontrado.', 'error');
+                        navigate('/configuracion/usuarios');
+                    }
+                })
+                .catch(() => {
+                    addNotification('Error al cargar el usuario.', 'error');
+                    navigate('/configuracion/usuarios');
+                })
+                .finally(() => setIsLoading(false));
+        }
+    }, [entidadId]);
+
+    const handleSubmit = async (values: Record<string, any>) => {
+        if (!company?.identificacionFiscal) {
+            addNotification('Error: No se pudo obtener la información de la empresa.', 'error');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            if (isEditMode && entidadId) {
+                // Modo actualización
+                const userData = {
+                    ...values,
+                    empresaId: company.identificacionFiscal,
+                    entidadId,
+                };
+                const response = await updateUser(userData);
+                addNotification(response.message, response.success ? 'success' : 'error');
+                if (response.success) {
+                    navigate('/configuracion/usuarios');
+                }
+            } else {
+                // Modo inserción
+                const userData = {
+                    ...values,
+                    empresaId: company.identificacionFiscal
+                };
+                const response = await createUser(userData);
+                addNotification(response.message, response.success ? 'success' : 'error');
+                if (response.success) {
+                    navigate('/configuracion/usuarios');
+                }
+            }
+        } catch (err: any) {
+            // Manejo de errores de validación tipo RFC 9110
+            if (err?.response?.data?.errors && typeof err.response.data.errors === 'object') {
+                const errors = err.response.data.errors;
+                Object.entries(errors).forEach(([field, messages]) => {
+                    if (Array.isArray(messages)) {
+                        messages.forEach((msg) => addNotification(msg, 'error'));
+                    }
+                });
+            } else {
+                addNotification('Error al guardar el usuario. Verifique sus datos e intente de nuevo.', 'error');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-background">
+            <div className="max-w-4xl mx-auto p-6">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-4 mb-4">
+                        <Link
+                            to="/configuracion/usuarios"
+                            className="flex items-center gap-2 text-text-secondary hover:text-orange-primary transition-colors duration-200"
+                        >
+                            <ArrowLeftIcon className="h-5 w-5" />
+                            <span>Volver a Usuarios</span>
+                        </Link>
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-text-primary">{isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'}</h1>
+                        <p className="text-text-secondary mt-2">{isEditMode ? 'Edita los datos del usuario' : 'Crea un nuevo usuario en el sistema'}</p>
+                    </div>
+                </div>
+
+                {/* Formulario */}
+                <div className="bg-card-background backdrop-blur-lg p-8 rounded-2xl border border-border">
+                    <DynamicForm
+                        fields={fields}
+                        initialValues={formValues}
+                        onSubmit={handleSubmit}
+                        submitText={isLoading ? (isEditMode ? 'Actualizando usuario...' : 'Creando usuario...') : (isEditMode ? 'Actualizar Usuario' : 'Crear Usuario')}
+                        renderSubmitButton={({ submitText }) => (
+                            <div className="flex flex-col items-center gap-4 md:col-span-2">
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full bg-gradient-to-r from-orange-primary to-red-primary text-white py-3 px-6 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium"
+                                >
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center">
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                            {submitText}
+                                        </div>
+                                    ) : (
+                                        submitText
+                                    )}
+                                </button>
+                                <p className="text-sm text-text-secondary mt-4">
+                                    ¿Necesitas ayuda?{' '}
+                                    <Link to="/configuracion" className="font-medium text-orange-primary hover:underline">
+                                        Ver configuración
+                                    </Link>
+                                </p>
+                            </div>
+                        )}
+                    />
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default UsuarioForm;

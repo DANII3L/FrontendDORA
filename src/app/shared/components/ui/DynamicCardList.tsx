@@ -4,6 +4,7 @@ import { Card } from './Card';
 import Pagination from '../Pagination';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useNotification } from '../../contexts/NotificationContext';
+import { Link } from 'react-router-dom';
 
 interface CardField {
   label: string;
@@ -94,12 +95,12 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
         res && 'totalRecords' in res && typeof res.totalRecords === 'number'
           ? res.totalRecords
           : Array.isArray(list)
-          ? list.length
-          : 0;
+            ? list.length
+            : 0;
 
       if (Array.isArray(list)) {
         setData(list);
-        setTotalRecords(total);
+        setTotalRecords(res && res.data && typeof res.data.totalRecords === 'number' ? res.data.totalRecords : 0);
         if (total === 0) {
           addNotification('No se encontraron registros', 'info');
         }
@@ -114,7 +115,6 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
         addNotification('Respuesta vacía del servidor', 'error');
       }
     } catch (e: any) {
-      console.error('API Error:', e);
       setData([]);
       setTotalRecords(0);
       const errorMessage = e?.response?.data?.message || e?.message || 'Error al cargar los datos';
@@ -126,9 +126,11 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   // Filtros locales (search y select)
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+    setCurrentPage(1);
   };
   const handleSelect = (key: string, value: string) => {
     setFilterValues(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
   };
 
   // Filtrado local para mockData
@@ -149,10 +151,15 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
     });
   }
 
+  let currentItems = data;
+  if (mockData) {
+    // paginación local solo para mockData
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  }
+
   // Paginación local
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = pagination ? filteredData.slice(indexOfFirstItem, indexOfLastItem) : filteredData;
   const totalPages = Math.ceil(totalRecords / itemsPerPage);
 
   return (
@@ -165,13 +172,13 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
             {subtitle && <p className="text-text-secondary mt-1">{subtitle}</p>}
           </div>
           {newButtonText && (newButtonLink ? (
-            <a
-              href={newButtonLink}
+            <Link
+              to={newButtonLink}
               className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <PlusIcon className="h-5 w-5" />
               <span>{newButtonText}</span>
-            </a>
+            </Link>
           ) : (
             <button
               onClick={onNew}

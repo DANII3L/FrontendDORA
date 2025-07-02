@@ -18,7 +18,7 @@ export default (
     <Route path="roles" element={<Roles />} />
     <Route path="usuarios" element={<UsuariosList />} />
     <Route path="usuarios/nuevo" element={<UsuarioForm />} />
-    <Route path="usuarios/:id/editar" element={<UsuarioForm />} />
+    <Route path="usuarios/:entidadId" element={<UsuarioForm />} />
     <Route path="perfil" element={<Perfil />} />
   </Route>
 );

@@ -48,7 +48,7 @@ const UsuariosList: React.FC = () => {
 
       <div className="pt-4 border-t border-border">
         <Link
-          to={`/usuarios/${usuario.id}/editar`}
+          to={`/configuracion/usuarios/${usuario.entidadId}`}
           className="w-full bg-background hover:bg-orange-primary/10 text-text-secondary hover:text-orange-primary px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-center block"
         >
           Editar
@@ -85,7 +85,7 @@ const UsuariosList: React.FC = () => {
       title="Usuarios"
       subtitle="Gestiona los usuarios del sistema"
       newButtonText="Nuevo Usuario"
-      newButtonLink="/usuarios/nuevo"
+      newButtonLink="/configuracion/usuarios/nuevo"
     />
   );
 };
