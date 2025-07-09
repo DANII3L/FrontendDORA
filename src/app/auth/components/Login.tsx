@@ -66,7 +66,7 @@ export default function Login() {
   ];
 
   const initialValues = {
-    empresaId: '',
+    empresaId: 'E-123456783',
     email: '',
     password: '',
   };

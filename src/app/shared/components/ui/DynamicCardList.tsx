@@ -35,6 +35,7 @@ interface DynamicCardListProps {
   newButtonText?: string;
   newButtonLink?: string;
   onNew?: () => void;
+  additionalParams?: { [key: string]: any };
 }
 
 const DynamicCardList: React.FC<DynamicCardListProps> = ({
@@ -53,6 +54,7 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   newButtonText,
   newButtonLink,
   onNew,
+  additionalParams = {},
 }) => {
   const [data, setData] = useState<any[]>(mockData || []);
   const [loading, setLoading] = useState(false);
@@ -70,7 +72,7 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
     }
     fetchData();
     // eslint-disable-next-line
-  }, [apiEndpoint, mockData, search, filterValues, currentPage, itemsPerPage]);
+  }, [apiEndpoint, mockData, search, filterValues, currentPage, itemsPerPage, additionalParams]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -78,6 +80,9 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
       const params: any = {};
       params.pageNumber = currentPage;
       params.pageSize = itemsPerPage;
+
+      // Agregar parámetros adicionales
+      Object.assign(params, additionalParams);
 
       // Construir el parámetro Filter
       const filterStrings: string[] = [];
@@ -89,7 +94,7 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
         params.Filter = 'AND ' + filterParam;
       }
 
-      const res = await apiService.get(apiEndpoint, params);
+      const res = await apiService.post(apiEndpoint, params);
       const list = res?.data?.listFind;
       const total =
         res && 'totalRecords' in res && typeof res.totalRecords === 'number'

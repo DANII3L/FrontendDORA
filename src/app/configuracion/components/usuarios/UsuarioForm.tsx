@@ -47,13 +47,13 @@ const UsuarioForm: React.FC = () => {
                 .then((user) => {
                     if (user) {
                         setFormValues({
-                            Nombre: user.data.Nombre || '',
-                            Apellidos: user.data.Apellidos || '',
-                            Identificacion: user.data.Identificacion || '',
-                            Correo: user.data.Correo || '',
-                            Telefono: user.data.Telefono || '',
-                            Password: '', // No se muestra la contraseña actual
-                            Rol: user.data.Rol ? String(user.data.Rol) : '2',
+                            Nombre: user.data.nombre || '',
+                            Apellidos: user.data.apellidos || '',
+                            Identificacion: user.data.identificacion || '',
+                            Correo: user.data.correo || '',
+                            Telefono: user.data.telefono || '',
+                            Password: '',
+                            Rol: user.data.rol ? String(user.data.rol) : '2',
                         });
                     } else {
                         addNotification('Usuario no encontrado.', 'error');
@@ -75,29 +75,17 @@ const UsuarioForm: React.FC = () => {
         }
         setIsLoading(true);
         try {
-            if (isEditMode && entidadId) {
-                // Modo actualización
-                const userData = {
-                    ...values,
-                    empresaId: company.identificacionFiscal,
-                    entidadId,
-                };
-                const response = await updateUser(userData);
-                addNotification(response.message, response.success ? 'success' : 'error');
-                if (response.success) {
-                    navigate('/configuracion/usuarios');
-                }
-            } else {
-                // Modo inserción
-                const userData = {
-                    ...values,
-                    empresaId: company.identificacionFiscal
-                };
-                const response = await createUser(userData);
-                addNotification(response.message, response.success ? 'success' : 'error');
-                if (response.success) {
-                    navigate('/configuracion/usuarios');
-                }
+            // Definir userData y la función a usar
+            const userData = {
+                ...values,
+                empresaId: company.identificacionFiscal,
+                ...(isEditMode && entidadId ? { entidadId } : {})
+            };
+            const userFn = (isEditMode && entidadId) ? updateUser : createUser;
+            const response = await userFn(userData);
+            addNotification(response.message, response.success ? 'success' : 'error');
+            if (response.success) {
+                navigate('/configuracion/usuarios');
             }
         } catch (err: any) {
             // Manejo de errores de validación tipo RFC 9110
@@ -138,36 +126,40 @@ const UsuarioForm: React.FC = () => {
 
                 {/* Formulario */}
                 <div className="bg-card-background backdrop-blur-lg p-8 rounded-2xl border border-border">
-                    <DynamicForm
-                        fields={fields}
-                        initialValues={formValues}
-                        onSubmit={handleSubmit}
-                        submitText={isLoading ? (isEditMode ? 'Actualizando usuario...' : 'Creando usuario...') : (isEditMode ? 'Actualizar Usuario' : 'Crear Usuario')}
-                        renderSubmitButton={({ submitText }) => (
-                            <div className="flex flex-col items-center gap-4 md:col-span-2">
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full bg-gradient-to-r from-orange-primary to-red-primary text-white py-3 px-6 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium"
-                                >
-                                    {isLoading ? (
-                                        <div className="flex items-center justify-center">
-                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                                            {submitText}
-                                        </div>
-                                    ) : (
-                                        submitText
-                                    )}
-                                </button>
-                                <p className="text-sm text-text-secondary mt-4">
-                                    ¿Necesitas ayuda?{' '}
-                                    <Link to="/configuracion" className="font-medium text-orange-primary hover:underline">
-                                        Ver configuración
-                                    </Link>
-                                </p>
-                            </div>
-                        )}
-                    />
+                    {isLoading ? (
+                        <div className="text-center py-8">Cargando datos del usuario...</div>
+                    ) : (
+                        <DynamicForm
+                            fields={fields}
+                            initialValues={formValues}
+                            onSubmit={handleSubmit}
+                            submitText={isEditMode ? 'Actualizar Usuario' : 'Crear Usuario'}
+                            renderSubmitButton={({ submitText }) => (
+                                <div className="flex flex-col items-center gap-4 md:col-span-2">
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full bg-gradient-to-r from-orange-primary to-red-primary text-white py-3 px-6 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium"
+                                    >
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center">
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                                {submitText}
+                                            </div>
+                                        ) : (
+                                            submitText
+                                        )}
+                                    </button>
+                                    <p className="text-sm text-text-secondary mt-4">
+                                        ¿Necesitas ayuda?{' '}
+                                        <Link to="/configuracion" className="font-medium text-orange-primary hover:underline">
+                                            Ver configuración
+                                        </Link>
+                                    </p>
+                                </div>
+                            )}
+                        />
+                    )}
                 </div>
             </div>
         </div>
