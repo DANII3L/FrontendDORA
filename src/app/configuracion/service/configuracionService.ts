@@ -10,7 +10,11 @@ const getUserById = async (entidadId: string) => {
 
 const updateUser = async (data: any) => {
     // Se espera que data contenga el campo 'id'
-    return await apiService.put(`Auth/usuario/${data.id}`, data);
+    return await apiService.put(`Usuarios/UpdateAsync`, data);
 };
 
-export { createUser, getUserById, updateUser };
+const deleteEntidad = async (entidadId: number, clienteId : number) => {
+    return await apiService.delete('Entidad/delete', `${entidadId}/${clienteId}`);
+};
+
+export { createUser, getUserById, updateUser, deleteEntidad };

@@ -25,6 +25,13 @@ const UsuarioForm: React.FC = () => {
     const { addNotification } = useNotification();
     const { company } = useCompany();
 
+    const RolTipo = ["Admin", "Supervisor", "Usuario", "Analista"];
+
+    function obtenerIndiceRol(rol: string): string {
+        const idx = RolTipo.findIndex(r => r.toLowerCase() === rol.toLowerCase());
+        return idx !== -1 ? String(idx) : "2";
+    }
+
     const fields: IFieldConfig[] = [
         { name: 'Nombre', label: 'Nombre', type: 'text', required: true, colSpan: 1, maxLength: 20 },
         { name: 'Apellidos', label: 'Apellidos', type: 'text', required: true, colSpan: 1 },
@@ -32,11 +39,12 @@ const UsuarioForm: React.FC = () => {
         { name: 'Correo', label: 'Correo Electrónico', type: 'email', required: true, colSpan: 2 },
         { name: 'Telefono', label: 'Teléfono', type: 'number', required: true, colSpan: 1 },
         { name: 'Rol', label: 'Rol', type: 'select', required: true, colSpan: 1, options: [
-            { value: '1', label: 'Administrador' },
+            { value: '0', label: 'Administrador' },
+            { value: '1', label: 'Supervisor' },
             { value: '2', label: 'Usuario' },
-            { value: '3', label: 'Editor' }
+            { value: '3', label: 'Analista' }
         ]},
-        { name: 'Password', label: 'Contraseña', type: 'password', required: true, colSpan: 2, minLength: 6, maxLength: 30 },
+        { name: 'Password', label: 'Contraseña', type: 'password', colSpan: 2, minLength: 6, maxLength: 30, required: !isEditMode },
     ];
 
     React.useEffect(() => {
@@ -53,7 +61,7 @@ const UsuarioForm: React.FC = () => {
                             Correo: user.data.correo || '',
                             Telefono: user.data.telefono || '',
                             Password: '',
-                            Rol: user.data.rol ? String(user.data.rol) : '2',
+                            Rol: user.data.rol ? obtenerIndiceRol(user.data.rol) : '2',
                         });
                     } else {
                         addNotification('Usuario no encontrado.', 'error');

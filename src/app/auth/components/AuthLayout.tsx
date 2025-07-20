@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../../shared/contexts/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
+import Background3D from './Background3D';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -13,11 +14,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
 
   return (
     <div className="min-h-screen flex">
-      {/* Lado izquierdo - Logo DORA */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-primary to-red-primary items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-8xl font-bold text-white mb-4">DORA</h1>
-          <p className="text-xl text-white/80">Tu asistente inteligente de CRM</p>
+      {/* Lado izquierdo - Logo DORA con fondo 3D */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-primary to-red-primary items-center justify-center relative overflow-hidden">
+        <Background3D />
+        <div className="text-center relative z-10">
+          <h1 className="text-8xl font-bold text-white mb-4 drop-shadow-2xl">DORA</h1>
+          <p className="text-xl text-white/90 drop-shadow-lg">Tu asistente inteligente de CRM</p>
         </div>
       </div>
 

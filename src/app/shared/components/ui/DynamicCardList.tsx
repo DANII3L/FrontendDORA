@@ -138,6 +138,11 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
     setCurrentPage(1);
   };
 
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   // Filtrado local para mockData
   let filteredData = data;
   if (mockData) {
@@ -161,11 +166,12 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
     // paginación local solo para mockData
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+    currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   }
 
   // Paginación local
-  const totalPages = Math.ceil(totalRecords / itemsPerPage);
+  const totalRecordsLocal = mockData ? filteredData.length : totalRecords;
+  const totalPages = Math.max(1, Math.ceil(totalRecordsLocal / itemsPerPage));
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -279,14 +285,14 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={setItemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
         />
       )}
 
       {/* Info de paginación */}
-      {pagination && totalRecords > 0 && (
+      {pagination && totalRecordsLocal > 0 && (
         <div className="flex justify-end text-sm text-text-secondary">
-          Mostrando página {currentPage} de {totalPages} | Total de registros: {totalRecords}
+          Mostrando página {currentPage} de {totalPages} | Total de registros: {totalRecordsLocal}
         </div>
       )}
     </div>
