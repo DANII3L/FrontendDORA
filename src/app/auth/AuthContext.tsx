@@ -1,23 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as segService from './service/segServices';
-import { useCompany } from '../shared/contexts/CompanyContext';
 
 interface User {
-  entidadId: number;
-  correo: string;
-  nombre: string;
-  apellidos: string;
-  rol: string;
-  avatar?: string;
+  username: string;
+  password: string;
+  // Agregar propiedades adicionales si las hay en la respuesta
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, empresaId: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  register: (data: any) => Promise<void>;
   isAuthenticated: boolean;
-  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,30 +26,57 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { setCompanyInfo, clearCompanyInfo } = useCompany();
+  const [authKey, setAuthKey] = useState(0); // Para forzar re-render
+
+  // Función para verificar si el token es válido
+  const isTokenValid = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    
+    try {
+      // Aquí podrías agregar lógica adicional para verificar la validez del token
+      // Por ejemplo, verificar si no ha expirado
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // Efecto para forzar re-render cuando cambie user
+  useEffect(() => {
+    setAuthKey(prev => prev + 1);
+  }, [user]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    if (savedUser && token) {
-      setUser(JSON.parse(savedUser));
+    
+    if (savedUser && token && isTokenValid()) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        // Limpiar datos corruptos
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    } else if (!isTokenValid()) {
+      // Limpiar si el token no es válido
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
-    setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string, empresaId: string) => {
-    const response = await segService.login({ email, password, empresaId });
+  const login = async (username: string, password: string) => {
+    const response = await segService.login({ username, password });
+    
     if (response.success) {
       if (response.data?.token && response.data?.user) {
-        const { razonSocial, identificacionFiscal, empresaId: companyId, ...userData } = response.data.user;
-        const companyData = { id: companyId, razonSocial, identificacionFiscal };
-
-        setUser(userData);
-        setCompanyInfo(companyData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('company', JSON.stringify(companyData));
+        
         return true;
       } else {
         throw new Error('Respuesta de API inválida tras un inicio de sesión exitoso.');
@@ -65,30 +86,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (data: any) => {
-    console.log(data);
-
-    const response = await segService.register(data);
-    if (!response.success) {
-      throw new Error(response.message || 'Error al registrar usuario.');
-    }
-  };
-
   const logout = () => {
     setUser(null);
-    clearCompanyInfo();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
 
+  // Verificar si el usuario está autenticado basado en user y token válido
+  const isAuthenticated = !!user && isTokenValid();
+
   return (
-    <AuthContext.Provider value={{
+    <AuthContext.Provider key={authKey} value={{
       user,
       login,
       logout,
-      register,
-      isAuthenticated: !!user,
-      loading
+      isAuthenticated
     }}>
       {children}
     </AuthContext.Provider>
