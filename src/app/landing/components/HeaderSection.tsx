@@ -61,26 +61,14 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         <div className="flex flex-col h-full">
           {/* Header del Sidebar */}
           <div className="flex items-center justify-between p-8 border-b border-white/10">
-            <h2 className="text-3xl font-bold text-white tracking-wider">NAVEGACIÓN</h2>
+            <h2 className="text-3xl font-bold text-white tracking-wider">CUENTA</h2>
           </div>
 
           {/* Navegación Principal */}
           <div className="flex-1 p-8">
-            <div className="space-y-1">
-              <button
-                onClick={() => { scrollToSection('inicio'); setIsMenuOpen(false); }}
-                className="w-full text-left text-white hover:bg-white/10 p-6 rounded-2xl transition-all duration-300 text-xl font-bold tracking-wide hover:scale-[1.02]"
-              >
-                INICIO
-              </button>
-            </div>
-
-            {/* Separador */}
-            <div className="my-12 border-t border-white/20"></div>
 
             {/* Autenticación */}
             <div className="space-y-1">
-              <h3 className="text-white/40 text-sm font-bold uppercase tracking-widest mb-6 px-6">CUENTA</h3>
               {!isAuthenticated ? (
                 <button
                   onClick={() => { 

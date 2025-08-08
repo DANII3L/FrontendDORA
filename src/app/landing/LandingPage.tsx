@@ -42,7 +42,7 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-[#1a2e29] to-[#2d4f4a]">
       {/* Header */}
       <HeaderSection
         scrollToSection={scrollToSection}
@@ -63,7 +63,7 @@ const LandingPage: React.FC = () => {
       )}
 
       {/* Footer - Altura fija */}
-      <footer className="bg-black/40 border-t border-white/10 py-4 flex-shrink-0">
+      <footer className="bg-black/70 border-t border-black/10 py-4 flex-shrink-0">
         <div className="container mx-auto px-6 text-center">
           <p className="text-white/60 text-sm">
             © 2025 Proyecto Admisión Million. Todos los derechos reservados.

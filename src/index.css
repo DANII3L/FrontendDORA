@@ -6,11 +6,13 @@
 
 /* Variables CSS para paletas de colores dinámicas */
 :root {
-  --color-primary: #0A1128;
-  --color-secondary: #001F54;
-  --color-tertiary: #034078;
-  --color-accent: #1282A2;
+  --color-primary: #1a2e29;
+  --color-secondary: #1f3833;
+  --color-tertiary: #2a4d45;
+  --color-accent: #34615a;
   --color-light: #FEFCFB;
+  --gradient-start: #1a2e29;
+  --gradient-end: #2d4f4a;
 }
 
 /* Estilos personalizados para el slider de video */
