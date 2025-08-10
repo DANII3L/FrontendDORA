@@ -127,6 +127,8 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
         };
       }
 
+      console.log('Cuerpo JSON enviado:', JSON.stringify(requestBody, null, 2));
+
       const res = typeEndpoint === "get" ? await apiService.get(apiEndpoint, requestBody) : await apiService.post(apiEndpoint, requestBody);
       const list = res?.data;
       if (Array.isArray(list) && list.length > 0) {
@@ -164,6 +166,10 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setHasData(false); // Resetear cuando cambia la búsqueda
+  };
+  const handleSelect = (key: string, value: string) => {
+    setFilterValues(prev => ({ ...prev, [key]: value }));
+    setHasData(false); // Resetear cuando cambian los filtros
   };
 
   // Filtrado local para mockData
@@ -233,7 +239,7 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
 
       {/* Filtros */}
       {filters.length > 0 && (
-        <div className="bg-black/10 backdrop-blur-lg p-6 rounded-2xl">
+        <div className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Selector de columnas */}
             {additionalParams.columnOptions && (

@@ -22,7 +22,7 @@ const HeroSection: React.FC<HeroSectionProps> = () => {
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(135deg, rgba(26, 46, 41, 0.8) 0%, rgba(45, 79, 74, 0.8) 100%)`
+            background: `linear-gradient(135deg,rgba(19, 30, 32, 0.5) 0%,rgba(95, 121, 117, 0.5) 50%,rgba(85, 187, 247, 0.5) 100%)`
           }}
         ></div>
         

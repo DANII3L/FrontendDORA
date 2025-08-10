@@ -68,21 +68,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
       {/* Modal */}
       <div className="relative w-full max-w-md mx-4">
-        <div className="bg-black/10 backdrop-blur-xl rounded-3xl border border-black/20 shadow-2xl overflow-hidden">
+        <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
           {/* Header del Modal */}
           <div className="relative p-8 text-center">
             {/* Botón de cerrar */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-black/60 hover:text-black transition-colors duration-200"
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors duration-200"
             >
               <X size={24} />
             </button>
 
             {/* Icono */}
-            <div className="w-16 h-16 bg-gradient-to-br from-[#1a2e29] to-[#34615a] rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 bg-[#34615a] rounded-sm"></div>
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                <div className="w-4 h-4 bg-purple-500 rounded-sm"></div>
               </div>
             </div>
 
@@ -109,7 +109,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-[#1a2e29] to-[#34615a] hover:from-[#34615a] hover:to-[#1a2e29] text-white py-4 px-6 rounded-xl hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium relative overflow-hidden group"
+                    className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 px-6 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium relative overflow-hidden group"
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center">
