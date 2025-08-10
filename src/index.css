@@ -2,215 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&display=swap');
-
-/* Variables CSS para paletas de colores dinámicas */
-:root {
-  --color-primary: #0A1128;
-  --color-secondary: #001F54;
-  --color-tertiary: #034078;
-  --color-accent: #1282A2;
-  --color-light: #FEFCFB;
-}
-
-/* Estilos personalizados para el slider de video */
-.slider::-webkit-slider-thumb {
-  appearance: none;
-  height: 16px;
-  width: 16px;
-  border-radius: 50%;
-  background: #ffffff;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.slider::-moz-range-thumb {
-  height: 16px;
-  width: 16px;
-  border-radius: 50%;
-  background: #ffffff;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.slider::-webkit-slider-track {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  height: 8px;
-}
-
-.slider::-moz-range-track {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  height: 8px;
-}
-
-/* Tipografía Gaming */
-.font-gaming {
-  font-family: 'Montserrat', monospace;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.font-gaming-secondary {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.font-gaming-light {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  letter-spacing: 0.02em;
-}
-
-/* Efectos de texto gaming */
-.text-gaming-glow {
-  text-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(255, 255, 255, 0.4),
-    0 0 30px rgba(255, 255, 255, 0.2);
-}
-
-.text-gaming-accent {
-  text-shadow: 
-    0 0 10px rgba(255, 69, 0, 0.8),
-    0 0 20px rgba(255, 69, 0, 0.4),
-    0 0 30px rgba(255, 69, 0, 0.2);
-}
-
-/* Animaciones para las secciones */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Animaciones para secciones de video */
-@keyframes slideInFromBottom {
-  from {
-    opacity: 0;
-    transform: translateY(100px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleInVideo {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Clases de animación */
-.animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.6s ease-out forwards;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.video-section-enter {
-  animation: slideInFromBottom 1s ease-out forwards;
-}
-
-.video-player-enter {
-  animation: scaleInVideo 1.2s ease-out forwards;
-  animation-delay: 0.3s;
-}
-
-/* Efectos de scroll reveal */
-.reveal-on-scroll {
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 0.8s ease-out;
-}
-
-.reveal-on-scroll.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Efectos de hover mejorados */
-.hover-glow:hover {
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-}
-
-/* Gradientes animados */
-.animated-gradient {
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
 @layer base {
-  
-  /* Estilos base para tipografía gaming */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', monospace;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  :root {
+    --color-background: 0 0% 98%; /* Light gray, almost white */
+    --color-card-background: 0 0% 100%; /* Pure white */
+    --color-text-primary: 222.2 84% 4.9%; /* Very dark gray (almost black) */
+    --color-text-secondary: 220 8% 46%; /* Medium gray */
+    --color-border: 220 14% 90%; /* Light gray border */
+    --color-accent-light: 80 75% 90%; /* Light lime green for accents/active backgrounds */
+    --color-accent-text: 80 80% 25%; /* Dark lime green for accent text */
+    --color-orange-primary: 25 95% 53%; /* Tailwind orange-500 HSL */
+    --color-red-primary: 350 95% 50%; /* Tailwind red-500 HSL */
+
+    --color-status-green: 142 76% 36%; /* Default green for active/success */
+    --color-status-blue: 204 88% 53%; /* Default blue for negotiation/info */
+    --color-status-orange: 25 95% 53%; /* Default orange for proposal/warning */
+    --color-status-yellow: 48 96% 48%; /* Default yellow for qualification */
+    --color-status-red: 0 95% 43%; /* Default red for lost/error */
+    --color-status-gray: 215 14% 65%; /* Default gray for inactive/neutral */
+
+    --color-status-green-light: 142 76% 90%; /* Light green background */
+    --color-status-blue-light: 204 88% 90%; /* Light blue background */
+    --color-status-orange-light: 25 95% 90%; /* Light orange background */
+    --color-status-yellow-light: 48 96% 90%; /* Light yellow background */
+    --color-status-red-light: 0 95% 90%; /* Light red background */
+    --color-status-gray-light: 220 14% 25%;
+
+    /* Chart specific colors to match image */
+    --color-chart-orange: 25 95% 53%; /* Same as orange-primary */
+    --color-chart-orange-alt: 35 90% 60%; /* For Emails/Oportunidades bar chart (yellow-orange) */
+    --color-chart-yellow: 48 96% 52%; /* Same as status-yellow */
+    --color-chart-teal: 180 70% 50%; /* For Tareas (teal/aqua green) */
   }
-  
-  .font-friendly {
-    font-family: 'Montserrat', 'Inter', 'Poppins', Arial, sans-serif;
+
+  .dark {
+    --color-background: 220 12% 15%; /* Darker gray background */
+    --color-card-background: 220 12% 20%; /* Slightly lighter dark gray for cards */
+    --color-text-primary: 210 40% 98%; /* Off-white text */
+    --color-text-secondary: 215 14% 65%; /* Lighter gray secondary text */
+    --color-border: 215 14% 50%; /* Darker gray border */
+    --color-accent-light: 80 75% 40%; /* Adjusted for dark mode, still greenish */
+    --color-accent-text: 210 40% 98%; /* Adjusted for dark mode, white text */
+    --color-orange-primary: 25 95% 53%;
+    --color-red-primary: 350 95% 50%;
+
+    --color-status-green: 142 76% 40%;
+    --color-status-blue: 204 88% 57%;
+    --color-status-orange: 25 95% 57%;
+    --color-status-yellow: 48 96% 52%;
+    --color-status-red: 0 95% 47%;
+    --color-status-gray: 215 14% 70%;
+
+    --color-status-green-light: 142 76% 20%; /* Dark green background in dark mode */
+    --color-status-blue-light: 204 88% 20%; /* Dark blue background in dark mode */
+    --color-status-orange-light: 25 95% 20%; /* Dark orange background in dark mode */
+    --color-status-yellow-light: 48 96% 20%; /* Dark yellow background in dark mode */
+    --color-status-red-light: 0 95% 20%; /* Dark red background in dark mode */
+    --color-status-gray-light: 220 14% 25%;
+
+    /* Chart specific colors to match image */
+    --color-chart-orange: 25 95% 53%; /* Same as orange-primary */
+    --color-chart-orange-alt: 35 90% 60%; /* For Emails/Oportunidades bar chart (yellow-orange) */
+    --color-chart-yellow: 48 96% 52%; /* Same as status-yellow */
+    --color-chart-teal: 180 70% 50%; /* For Tareas (teal/aqua green) */
   }
-  .text-pastel-pink {
-    color: #ffffff;
+
+  body {
+    @apply bg-background text-text-primary;
   }
-  .font-medium {
-    font-weight: 500;
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
   }
 }
