@@ -1,9 +1,11 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import Analytics from '../components/Analytics';
+import AnalyticsDashboard from '../pages/AnalyticsDashboard';
 
-export default (
+const AnalyticsRoutes = (
   <Route path="analytics">
-    <Route index element={<Analytics />} />
+    <Route index element={<AnalyticsDashboard />} />
   </Route>
 );
+
+export default AnalyticsRoutes;

@@ -1,18 +1,15 @@
-# D.O.R.A. - CRM Moderno
+# WorldGaming - Torneos gaming moderno
 
 ## Descripción del Proyecto
-D.O.R.A. (Desarrollo Organizacional y Registro Automatizado) es un sistema CRM (Customer Relationship Management) moderno y responsivo diseñado para gestionar clientes, oportunidades de venta, tareas, tickets de soporte y productos de manera eficiente. Este proyecto se enfoca en proporcionar una interfaz de usuario intuitiva y adaptable, con soporte para temas claro y oscuro, y visualizaciones de datos interactivas para una mejor toma de decisiones.
+World Gaming. Ideal para administración de torneos y equipos de equipos gaming.
 
 ## Características
-- **Gestión de Clientes**: Añade, edita y visualiza detalles de tus clientes.
-- **Gestión de Oportunidades de Venta**: Haz seguimiento de tus ventas con un sistema Kanban.
-- **Gestión de Tareas**: Organiza y programa actividades diarias.
-- **Sistema de Soporte (Tickets)**: Administra y resuelve las consultas de tus clientes.
-- **Gestión de Productos**: Mantén un catálogo actualizado de tus productos.
-- **Dashboard Interactivo**: Visualiza métricas clave de ventas, oportunidades y actividades con gráficos dinámicos.
-- **Temas Claro/Oscuro**: Alterna entre modos de visualización para una mejor experiencia de usuario.
-- **Diseño Responsivo**: Adaptable a diferentes tamaños de pantalla (escritorio, tabletas, móviles).
-- **Componentes Reutilizables**: Desarrollado con una arquitectura modular para facilitar el mantenimiento y la escalabilidad.
+- **Gestión de Juegos**: Añade, edita y visualiza detalles de tus clientes.
+- **Gestión de Equipos**: Haz seguimiento de tus ventas con un sistema Kanban.
+- **Torneos**: Organiza y programa actividades diarias.
+- **Comunidad y Social**: Administra y resuelve las consultas de tus clientes.
+- **Gamificación**: Mantén un catálogo actualizado de tus productos.
+- **Administración**: Visualiza métricas clave de ventas, oportunidades y actividades con gráficos dinámicos.
 
 ## Tecnologías Utilizadas
 - **React**: Biblioteca de JavaScript para construir interfaces de usuario.
@@ -52,17 +49,9 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu entorno local:
 
 ## Uso
 Una vez que la aplicación esté en funcionamiento, puedes navegar a las diferentes secciones utilizando el sidebar.
-- **Dashboard**: Para una visión general de las métricas.
-- **Clientes, Oportunidades, Tareas, Tickets, Productos**: Para gestionar los respectivos módulos.
+- **Dashboard del Usuario**: Para una visión general sobre el proyecto.
+- **Juegos, Equipos, Torneos, Social / Comunidad**: Para gestionar los respectivos módulos.
 - **Botón de Tema**: En el encabezado, podrás alternar entre el modo claro y oscuro.
 
-## Contribución
-Las contribuciones son bienvenidas. Si deseas contribuir, por favor, sigue estos pasos:
-1.  Haz un fork del repositorio.
-2.  Crea una nueva rama para tu característica (`git checkout -b feature/nueva-caracteristica`).
-3.  Realiza tus cambios y commitea (`git commit -m 'feat: Añade nueva característica'`).
-4.  Empuja tus cambios a tu fork (`git push origin feature/nueva-caracteristica`).
-5.  Abre un Pull Request.
-
 ## Licencia
-Este proyecto está bajo el grupo de desarrollo J.D.J. 
+Este proyecto está bajo el grupo de desarrollo World Gaming. 

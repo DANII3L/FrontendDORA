@@ -1,290 +1,374 @@
 import React, { useState } from 'react';
-import { IFieldConfig } from '../../interface/IFieldConfig'
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { Upload, X } from 'lucide-react';
-import FileUploadModal from './FileUploadModal';
+import { LucideIcon, Plus, Trash2 } from 'lucide-react';
 
-interface DynamicFormProps {
-  fields: IFieldConfig[];
-  initialValues: Record<string, any>;
-  onSubmit: (values: Record<string, any>) => void;
-  submitText?: string;
+export interface FormField {
+  name: string;
+  label: string;
+  type: 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'file' | 'checkbox' | 'radio' | 'requirements';
+  placeholder?: string;
+  required?: boolean;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+  step?: number;
+  options?: { value: string; label: string }[];
+  validation?: {
+    pattern?: string;
+    message?: string;
+  };
+  icon?: LucideIcon;
   className?: string;
-  renderSubmitButton?: (props: { submitText: string }) => React.ReactNode;
-  submitButtonClassName?: string;
+  requirementsConfig?: {
+    title?: string;
+    subtitle?: string;
+    placeholder?: string;
+    maxHeight?: string;
+  };
 }
 
-const validate = (fields: IFieldConfig[], values: Record<string, any>) => {
-  const errors: Record<string, string> = {};
-  for (const field of fields) {
-    const value = values[field.name];
-    if (field.required && (!value || value === '')) {
-      errors[field.name] = 'Este campo es obligatorio';
-    }
-    if (field.type === 'email' && value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        errors[field.name] = 'Correo inválido';
-      }
-    }
-    if (field.maxLength && value && value.length > field.maxLength) {
-      errors[field.name] = `Máximo ${field.maxLength} caracteres`;
-    }
-    if (field.minLength && value && value.length < field.minLength) {
-      errors[field.name] = `Mínimo ${field.minLength} caracteres`;
-    }
-  }
-  return errors;
-};
-
-const renderField = (
-  field: IFieldConfig,
-  value: any,
-  error: string | undefined,
-  touched: boolean | undefined,
-  handleChange: React.ChangeEventHandler<any>,
-  handleBlur: React.FocusEventHandler<any>,
-  passwordVisibility: Record<string, boolean>,
-  togglePasswordVisibility: (name: string) => void,
-  handleFileSelect?: (fieldName: string, file: File, preview: string) => void,
-  openFileModal?: (fieldName: string) => void,
-  handleFileClear?: (fieldName: string) => void
-) => {
-  const baseClass = `w-full px-6 py-3 rounded-xl border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-light transition-all duration-200 ${error && touched ? 'border-red-500' : 'border-border'}`;
-  
-  switch (field.type) {
-    case 'file':
-      return (
-        <div className="space-y-3">
-          <button
-            type="button"
-            onClick={() => openFileModal?.(field.name)}
-            className="w-full px-6 py-3 rounded-xl border-2 border-dashed border-border hover:border-orange-primary hover:bg-orange-50 transition-all duration-200 flex items-center justify-center gap-2 text-text-secondary hover:text-text-primary"
-          >
-            <Upload className="h-5 w-5" />
-            <span>Seleccionar archivo</span>
-          </button>
-          {value && (
-            <div className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border">
-              {field.fileType?.startsWith('image/') && value.preview ? (
-                <img
-                  src={value.preview}
-                  alt="preview"
-                  className="h-12 w-12 rounded object-cover"
-                />
-              ) : (
-                <div className="h-12 w-12 bg-gray-100 rounded flex items-center justify-center">
-                  <Upload className="h-6 w-6 text-gray-500" />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary truncate">
-                  {value.name}
-                </p>
-                <p className="text-xs text-text-secondary">
-                  {(value.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleFileClear?.(field.name)}
-                className="p-1 hover:bg-red-100 rounded text-red-500"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    case 'select':
-      return (
-        <select
-          id={field.name}
-          name={field.name}
-          value={value || ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          className={baseClass}
-        >
-          <option value="">Selecciona...</option>
-          {(Array.isArray(field.options) ? field.options : []).map(opt =>
-            typeof opt === 'string'
-              ? <option key={opt} value={opt}>{opt}</option>
-              : <option key={opt.value} value={opt.value}>{opt.label}</option>
-          )}
-        </select>
-      );
-    case 'textarea':
-      return (
-        <textarea
-          id={field.name}
-          name={field.name}
-          value={value || ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder={field.placeholder}
-          className={baseClass}
-        />
-      );
-    case 'password':
-      return (
-        <div className="relative">
-          <input
-            id={field.name}
-            name={field.name}
-            type={passwordVisibility[field.name] ? 'text' : 'password'}
-            value={value || ''}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={field.placeholder}
-            maxLength={field.maxLength}
-            minLength={field.minLength}
-            className={`${baseClass} pr-10`}
-          />
-          <button
-            type="button"
-            onClick={() => togglePasswordVisibility(field.name)}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-text-secondary hover:text-text-primary"
-          >
-            {passwordVisibility[field.name] ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-          </button>
-        </div>
-      );
-    default:
-      return (
-        <input
-          id={field.name}
-          name={field.name}
-          type={field.type}
-          value={value || ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder={field.placeholder}
-          maxLength={field.maxLength}
-          minLength={field.minLength}
-          className={baseClass}
-        />
-      );
-  }
-};
+export interface DynamicFormProps {
+  fields: FormField[];
+  values: Record<string, any>;
+  onChange: (name: string, value: any) => void;
+  onSubmit: (values: Record<string, any>) => void;
+  title?: string;
+  subtitle?: string;
+  submitText?: string;
+  cancelText?: string;
+  onCancel?: () => void;
+  loading?: boolean;
+  className?: string;
+  layout?: 'vertical' | 'horizontal' | 'grid';
+  columns?: 1 | 2 | 3;
+  showCancelButton?: boolean;
+  icon?: LucideIcon;
+  iconColor?: string;
+  requirementsData?: Record<string, string[]>;
+  onRequirementsChange?: (fieldName: string, requirements: string[]) => void;
+  renderSubmitButton?: ({ submitText, loading }: { submitText: string; loading: boolean }) => React.ReactNode;
+}
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
-  fields, initialValues, onSubmit, submitText = 'Guardar', className = '', renderSubmitButton
+  fields,
+  values,
+  onChange,
+  onSubmit,
+  title,
+  subtitle,
+  submitText = 'Guardar',
+  cancelText = 'Cancelar',
+  onCancel,
+  loading = false,
+  className = '',
+  layout = 'vertical',
+  columns = 1,
+  showCancelButton = true,
+  icon: Icon,
+  iconColor = 'text-blue-400',
+  requirementsData = {},
+  onRequirementsChange,
+  renderSubmitButton
 }) => {
-  const [values, setValues] = useState(initialValues);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
-  const [fileModalOpen, setFileModalOpen] = useState(false);
-  const [currentFileField, setCurrentFileField] = useState<string>('');
-
-  const togglePasswordVisibility = (fieldName: string) => {
-    setPasswordVisibility(prev => ({ ...prev, [fieldName]: !prev[fieldName] }));
-  };
-
-  const handleChange = (e: React.ChangeEvent<any>) => {
-    const { name, value } = e.target;
-    setValues(prev => ({ ...prev, [name]: value }));
-    setTouched(prev => ({ ...prev, [name]: true }));
-  };
-
-  const handleFileClear = (fieldName: string) => {
-    setValues(prev => ({ ...prev, [fieldName]: null }));
-    setTouched(prev => ({ ...prev, [fieldName]: true }));
-  };
-
-  const handleBlur = (e: React.FocusEvent<any>) => {
-    const { name } = e.target;
-    setTouched(prev => ({ ...prev, [name]: true }));
-    setErrors(validate(fields, { ...values, [name]: values[name] }));
-  };
-
-  const handleFileSelect = (fieldName: string, file: File, preview: string) => {
-    setValues(prev => ({
-      ...prev,
-      [fieldName]: {
-        file,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        preview: file.type.startsWith('image/') ? preview : null
-      }
-    }));
-    setTouched(prev => ({ ...prev, [fieldName]: true }));
-  };
-
-  const openFileModal = (fieldName: string) => {
-    setCurrentFileField(fieldName);
-    setFileModalOpen(true);
-  };
+  const [newRequirements, setNewRequirements] = useState<Record<string, string>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors = validate(fields, values);
-    setErrors(newErrors);
-    setTouched(Object.fromEntries(fields.map(f => [f.name, true])));
-    if (Object.keys(newErrors).length === 0) {
-      onSubmit(values);
+    onSubmit(values);
+  };
+
+  const handleInputChange = (name: string, value: any) => {
+    onChange(name, value);
+  };
+
+  const handleAddRequirement = (fieldName: string) => {
+    const newReq = newRequirements[fieldName]?.trim();
+    if (newReq && onRequirementsChange) {
+      const currentRequirements = requirementsData[fieldName] || [];
+      
+      // Dividir por comas y limpiar cada elemento
+      const newRequirementsList = newReq
+        .split(',')
+        .map(req => req.trim())
+        .filter(req => req.length > 0);
+      
+      // Agregar todos los requisitos divididos
+      onRequirementsChange(fieldName, [...currentRequirements, ...newRequirementsList]);
+      setNewRequirements(prev => ({ ...prev, [fieldName]: '' }));
     }
   };
 
-  const currentFileFieldConfig = fields.find(f => f.name === currentFileField);
+  const handleRemoveRequirement = (fieldName: string, index: number) => {
+    if (onRequirementsChange) {
+      const currentRequirements = requirementsData[fieldName] || [];
+      onRequirementsChange(fieldName, currentRequirements.filter((_, i) => i !== index));
+    }
+  };
+
+  const renderField = (field: FormField) => {
+    const value = values[field.name] || '';
+    const fieldId = `field-${field.name}`;
+
+    const baseInputClasses = "w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 transition-all duration-200";
+    const fieldClasses = field.className ? `${baseInputClasses} ${field.className}` : baseInputClasses;
+
+    switch (field.type) {
+      case 'textarea':
+        return (
+          <textarea
+            id={fieldId}
+            name={field.name}
+            value={value}
+            onChange={(e) => handleInputChange(field.name, e.target.value)}
+            placeholder={field.placeholder}
+            required={field.required}
+            minLength={field.minLength}
+            maxLength={field.maxLength}
+            className={`${fieldClasses} resize-none`}
+            rows={4}
+          />
+        );
+
+      case 'select':
+        return (
+          <select
+            id={fieldId}
+            name={field.name}
+            value={value}
+            onChange={(e) => handleInputChange(field.name, e.target.value)}
+            required={field.required}
+            className={fieldClasses}
+          >
+            <option value="" className="bg-gray-800">
+              {field.placeholder || 'Seleccionar...'}
+            </option>
+            {field.options?.map(option => (
+              <option key={option.value} value={option.value} className="bg-gray-800">
+                {option.label}
+              </option>
+            ))}
+          </select>
+        );
+
+      case 'file':
+        return (
+          <div className="relative">
+            <input
+              id={fieldId}
+              type="file"
+              name={field.name}
+              onChange={(e) => handleInputChange(field.name, e.target.files?.[0] || null)}
+              required={field.required}
+              className="hidden"
+              accept="image/*"
+            />
+            <label
+              htmlFor={fieldId}
+              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white cursor-pointer hover:bg-white/20 transition-all duration-200 flex items-center justify-center"
+            >
+              {value && typeof value === 'object' && 'name' in value ? value.name : (field.placeholder || 'Seleccionar archivo')}
+            </label>
+          </div>
+        );
+
+      case 'checkbox':
+        return (
+          <div className="flex items-center space-x-3">
+            <input
+              id={fieldId}
+              type="checkbox"
+              name={field.name}
+              checked={value}
+              onChange={(e) => handleInputChange(field.name, e.target.checked)}
+              required={field.required}
+              className="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <label htmlFor={fieldId} className="text-white text-sm">
+              {field.label}
+            </label>
+          </div>
+        );
+
+      case 'radio':
+        return (
+          <div className="space-y-2">
+            {field.options?.map(option => (
+              <div key={option.value} className="flex items-center space-x-3">
+                <input
+                  id={`${fieldId}-${option.value}`}
+                  type="radio"
+                  name={field.name}
+                  value={option.value}
+                  checked={value === option.value}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  required={field.required}
+                  className="w-4 h-4 text-blue-600 bg-white/10 border-white/20 focus:ring-blue-500 focus:ring-2"
+                />
+                <label htmlFor={`${fieldId}-${option.value}`} className="text-white text-sm">
+                  {option.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        );
+
+      case 'requirements':
+        const requirements = requirementsData[field.name] || [];
+        const config = field.requirementsConfig || {};
+        return (
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">
+                {config.title || field.label} {field.required && <span className="text-red-400">*</span>}
+              </h4>
+              {config.subtitle && (
+                <p className="text-white/60 text-sm mb-4">{config.subtitle}</p>
+              )}
+            </div>
+
+            {/* Lista de requisitos */}
+            <div className={`space-y-2 mb-4 ${config.maxHeight || 'max-h-40'} overflow-y-auto`}>
+              {requirements.map((requisito, index) => (
+                <div key={index} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3 border border-gray-600">
+                  <span className="text-white flex-1">{requisito}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRequirement(field.name, index)}
+                    className="ml-3 p-1 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Agregar nuevo requisito */}
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={newRequirements[field.name] || ''}
+                onChange={(e) => setNewRequirements(prev => ({ ...prev, [field.name]: e.target.value }))}
+                placeholder={config.placeholder || "Ej: Ganar 1 torneo (puedes separar por comas)"}
+                className="flex-1 px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 transition-all duration-200"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddRequirement(field.name)}
+              />
+              <button
+                type="button"
+                onClick={() => handleAddRequirement(field.name)}
+                disabled={!newRequirements[field.name]?.trim()}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+
+            {requirements.length === 0 && (
+              <p className="text-gray-400 text-sm mt-2">No hay requisitos agregados. Agrega al menos uno.</p>
+            )}
+          </div>
+        );
+
+      default:
+        return (
+          <input
+            id={fieldId}
+            type={field.type}
+            name={field.name}
+            value={value}
+            onChange={(e) => handleInputChange(field.name, e.target.value)}
+            placeholder={field.placeholder}
+            required={field.required}
+            min={field.min}
+            max={field.max}
+            step={field.step}
+            pattern={field.validation?.pattern}
+            minLength={field.minLength}
+            maxLength={field.maxLength}
+            className={fieldClasses}
+          />
+        );
+    }
+  };
+
+  const getLayoutClasses = () => {
+    switch (layout) {
+      case 'horizontal':
+        return 'grid grid-cols-1 md:grid-cols-2 gap-6';
+      case 'grid':
+        switch (columns) {
+          case 1: return 'grid grid-cols-1 gap-6';
+          case 2: return 'grid grid-cols-1 md:grid-cols-2 gap-6';
+          case 3: return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+          default: return 'grid grid-cols-1 gap-6';
+        }
+      default:
+        return 'space-y-6';
+    }
+  };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className={`space-y-6 p-6 ${className}`} autoComplete="off">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {fields.map(field => (
-            <div
-              key={field.name}
-              className={`${field.colSpan === 2 ? 'md:col-span-2' : ''}`}
-            >
-              <label htmlFor={field.name} className="block text-sm font-medium text-text-primary mb-2">
-                {field.label}{field.required && <span className="text-red-500">*</span>}
-              </label>
-              {renderField(
-                field,
-                values[field.name],
-                errors[field.name],
-                touched[field.name],
-                handleChange,
-                handleBlur,
-                passwordVisibility,
-                togglePasswordVisibility,
-                handleFileSelect,
-                openFileModal,
-                handleFileClear
+    <div className={`bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 shadow-lg ${className}`}>
+      <form onSubmit={handleSubmit} className="p-6">
+        {/* Header */}
+        {(title || subtitle || Icon) && (
+          <div className="mb-6">
+            <div className="flex items-center space-x-3 mb-2">
+              {Icon && (
+                <div className={`p-2 rounded-xl ${iconColor.replace('text-', 'bg-')}/20`}>
+                  <Icon className={`w-5 h-5 ${iconColor}`} />
+                </div>
               )}
-              {errors[field.name] && touched[field.name] && (
-                <span className="text-xs text-red-500 mt-1">{errors[field.name]}</span>
+              {title && <h2 className="text-xl font-bold text-white">{title}</h2>}
+            </div>
+            {subtitle && <p className="text-white/60 text-sm">{subtitle}</p>}
+          </div>
+        )}
+
+        {/* Fields */}
+        <div className={getLayoutClasses()}>
+          {fields.map((field) => (
+            <div key={field.name} className="space-y-2">
+              {field.type !== 'checkbox' && field.type !== 'radio' && field.type !== 'requirements' && (
+                <label htmlFor={`field-${field.name}`} className="block text-white/80 text-sm font-medium">
+                  {field.label}
+                  {field.required && <span className="text-red-400 ml-1">*</span>}
+                </label>
+              )}
+              {renderField(field)}
+              {field.validation?.message && (
+                <p className="text-red-400 text-xs">{field.validation.message}</p>
               )}
             </div>
           ))}
         </div>
-        {renderSubmitButton ? (
-          renderSubmitButton({ submitText })
-        ) : (
-          <div className="flex justify-end">
+
+        {/* Actions */}
+        <div className="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-white/10">
+          {showCancelButton && onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+            >
+              {cancelText}
+            </button>
+          )}
+          {renderSubmitButton ? (
+            <div>
+              {renderSubmitButton({ submitText, loading })}
+            </div>
+          ) : (
             <button
               type="submit"
-              className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+              disabled={loading}
+              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
-              {submitText}
+              {loading ? 'Guardando...' : submitText}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </form>
-
-      <FileUploadModal
-        isOpen={fileModalOpen}
-        onClose={() => setFileModalOpen(false)}
-        onFileSelect={(file, preview) => handleFileSelect(currentFileField, file, preview)}
-        accept={currentFileFieldConfig?.accept || '*/*'}
-        multiple={currentFileFieldConfig?.multiple || false}
-        title={currentFileFieldConfig?.label || 'Seleccionar archivo'}
-        description={currentFileFieldConfig?.placeholder || 'Arrastra y suelta archivos aquí o haz clic para seleccionar'}
-      />
-    </>
+    </div>
   );
 };
 

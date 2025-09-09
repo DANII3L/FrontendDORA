@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../auth/AuthContext';
-import { useCompany } from '../../../shared/contexts/CompanyContext';
-import { User, Lock, Settings} from 'lucide-react';
+import { User, Lock, Settings } from 'lucide-react';
 import DynamicForm from '../../../shared/components/ui/DynamicForm';
 import { IFieldConfig } from '../../../shared/interface/IFieldConfig';
 import { useNotification } from '../../../shared/contexts/NotificationContext';
@@ -14,7 +13,6 @@ const tabs = [
 
 const Perfil: React.FC = () => {
   const { user } = useAuth();
-  const { company } = useCompany();
   const [activeTab, setActiveTab] = useState('personal');
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -32,18 +30,24 @@ const Perfil: React.FC = () => {
     { name: 'confirmPassword', label: 'Confirmar nueva contraseña', type: 'password', required: true, colSpan: 1 },
   ];
   const preferencesFields: IFieldConfig[] = [
-    { name: 'theme', label: 'Tema', type: 'select', required: true, colSpan: 1, options: [
-      { value: 'light', label: 'Claro' },
-      { value: 'dark', label: 'Oscuro' },
-    ] },
-    { name: 'notifications', label: 'Recibir notificaciones', type: 'select', required: true, colSpan: 1, options: [
-      { value: 'true', label: 'Sí' },
-      { value: 'false', label: 'No' },
-    ] },
-    { name: 'idioma', label: 'Idioma', type: 'select', required: true, colSpan: 2, options: [
-      { value: 'es', label: 'Español' },
-      { value: 'en', label: 'Inglés' },
-    ] },
+    {
+      name: 'theme', label: 'Tema', type: 'select', required: true, colSpan: 1, options: [
+        { value: 'light', label: 'Claro' },
+        { value: 'dark', label: 'Oscuro' },
+      ]
+    },
+    {
+      name: 'notifications', label: 'Recibir notificaciones', type: 'select', required: true, colSpan: 1, options: [
+        { value: 'true', label: 'Sí' },
+        { value: 'false', label: 'No' },
+      ]
+    },
+    {
+      name: 'idioma', label: 'Idioma', type: 'select', required: true, colSpan: 2, options: [
+        { value: 'es', label: 'Español' },
+        { value: 'en', label: 'Inglés' },
+      ]
+    },
   ];
 
   // Valores iniciales
@@ -109,10 +113,10 @@ const Perfil: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 bg-card-background rounded-3xl shadow-2xl p-8 border border-border-color">
+    <div className="max-w-4xl mx-auto mt-10 bg-white/10 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20">
       <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
         <div className="flex flex-col items-center md:items-start">
-          <div className="h-24 w-24 rounded-full bg-gradient-to-r from-orange-primary to-red-primary flex items-center justify-center text-white text-4xl font-bold mb-2 cursor-pointer relative group" onClick={handleAvatarClick}>
+          <div className="h-24 w-24 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white text-4xl font-bold mb-2 cursor-pointer relative group hover:scale-105 transition-transform duration-200" onClick={handleAvatarClick}>
             {avatarPreview ? (
               <img src={avatarPreview} alt="avatar" className="h-24 w-24 rounded-full object-cover" />
             ) : (
@@ -125,17 +129,14 @@ const Perfil: React.FC = () => {
               className="hidden"
               onChange={handleAvatarChange}
             />
-            <span className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow group-hover:scale-110 transition-transform">
-              <User className="h-5 w-5 text-orange-primary" />
+            <span className="absolute bottom-2 right-2 bg-white/20 backdrop-blur-sm rounded-full p-1 shadow-lg group-hover:scale-110 transition-transform border border-white/30">
+              <User className="h-5 w-5 text-white" />
             </span>
           </div>
           <div className="text-center md:text-left">
-            <h2 className="text-2xl font-bold text-text-primary">{user?.nombre} {user?.apellidos}</h2>
-            <p className="text-text-secondary text-sm">{user?.correo}</p>
-            <p className="text-text-secondary text-xs mt-1">Rol: <span className="font-semibold">{user?.rol}</span></p>
-            {company && (
-              <p className="text-text-secondary text-xs mt-1">Empresa: <span className="font-semibold">{company.razonSocial}</span> ({company.identificacionFiscal})</p>
-            )}
+            <h2 className="text-2xl font-bold text-white">{user?.nombre} {user?.apellidos}</h2>
+            <p className="text-white/80 text-sm">{user?.correo}</p>
+            <p className="text-white/60 text-xs mt-1">Rol: <span className="font-semibold text-white/90">{user?.rol}</span></p>
           </div>
         </div>
         <div className="flex-1 flex justify-center md:justify-end">
@@ -143,7 +144,10 @@ const Perfil: React.FC = () => {
             {tabs.map(tab => (
               <button
                 key={tab.key}
-                className={`flex items-center px-4 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${activeTab === tab.key ? 'bg-gradient-to-r from-orange-primary to-red-primary text-white shadow-lg' : 'bg-background text-text-primary border border-border-color hover:bg-orange-50'}`}
+                className={`flex items-center px-4 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${activeTab === tab.key
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transform scale-105'
+                    : 'bg-white/10 backdrop-blur-sm text-white/80 border border-white/20 hover:bg-white/15 hover:text-white hover:scale-105'
+                  }`}
                 onClick={() => setActiveTab(tab.key)}
               >
                 {tab.icon}{tab.label}
@@ -156,85 +160,36 @@ const Perfil: React.FC = () => {
       <div className="mt-6">
         {activeTab === 'personal' && (
           <DynamicForm
-            fields={personalFields}
-            initialValues={initialPersonal}
+            fields={personalFields as any}
+            values={initialPersonal}
+            onChange={() => { }}
             onSubmit={handleSave}
             submitText={saving ? 'Guardando...' : 'Guardar cambios'}
-            renderSubmitButton={({ submitText }) => (
-              <div className="flex justify-center md:col-span-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="bg-gradient-to-r from-orange-primary to-red-primary text-white py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium text-lg min-w-[200px]"
-                >
-                  {saving ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      {submitText}
-                    </div>
-                  ) : (
-                    submitText
-                  )}
-                </button>
-              </div>
-            )}
           />
         )}
         {activeTab === 'security' && (
           <DynamicForm
-            fields={securityFields}
-            initialValues={initialSecurity}
+            fields={securityFields as any}
+            values={initialSecurity}
+            onChange={() => { }}
             onSubmit={handleSave}
             submitText={saving ? 'Guardando...' : 'Guardar cambios'}
-            renderSubmitButton={({ submitText }) => (
-              <div className="flex justify-center md:col-span-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="bg-gradient-to-r from-orange-primary to-red-primary text-white py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium text-lg min-w-[200px]"
-                >
-                  {saving ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      {submitText}
-                    </div>
-                  ) : (
-                    submitText
-                  )}
-                </button>
-              </div>
-            )}
           />
         )}
         {activeTab === 'preferences' && (
           <DynamicForm
-            fields={preferencesFields}
-            initialValues={initialPreferences}
+            fields={preferencesFields as any}
+            values={initialPreferences}
+            onChange={() => { }}
             onSubmit={handleSave}
             submitText={saving ? 'Guardando...' : 'Guardar cambios'}
-            renderSubmitButton={({ submitText }) => (
-              <div className="flex justify-center md:col-span-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="bg-gradient-to-r from-orange-primary to-red-primary text-white py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium text-lg min-w-[200px]"
-                >
-                  {saving ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      {submitText}
-                    </div>
-                  ) : (
-                    submitText
-                  )}
-                </button>
-              </div>
-            )}
           />
         )}
       </div>
       {success && (
-        <div className="mt-4 text-green-600 text-center font-medium">¡Cambios guardados exitosamente!</div>
+        <div className="mt-4 text-green-400 text-center font-medium bg-green-500/10 backdrop-blur-sm rounded-lg p-3 border border-green-500/20">
+          ¡Cambios guardados exitosamente!
+        </div>
       )}
     </div>
   );

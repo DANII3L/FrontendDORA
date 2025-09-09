@@ -11,12 +11,12 @@ import {
   ShoppingCart,
   Target,
   Cog,
-  Bot,
   Circle
 } from 'lucide-react';
 
-// Importar todos los archivos de navegación
+// Importar todos los archivos de navegación (solo .ts para evitar duplicados)
 const navigationModules = import.meta.glob('../../**/routes/routes.ts', { eager: true });
+const navigationConfigs = import.meta.glob('../../**/routes/navigation.ts', { eager: true });
 
 // Mapeo de iconos por módulo
 const ICON_MAPPING: Record<string, LucideIcon> = {
@@ -29,7 +29,7 @@ const ICON_MAPPING: Record<string, LucideIcon> = {
   'inventario': ShoppingCart,
   'marketing': Target,
   'configuracion': Cog,
-  'dora': Bot,
+  'torneos': Target,
 };
 
 // Función para extraer el nombre del módulo del path
@@ -58,8 +58,14 @@ const processNavigationModule = (modulePath: string, moduleExports: any): Naviga
     ) as NavigationItem;
 
     if (mainExport) {
+      // Añadir prefijo /worldGaming si no lo tiene ya
+      const href = mainExport.href.startsWith('/worldGaming') 
+        ? mainExport.href 
+        : `/worldGaming${mainExport.href}`;
+      
       return {
         ...mainExport,
+        href,
         icon: mainExport.icon || getIconForModule(moduleName)
       };
     }
@@ -68,7 +74,7 @@ const processNavigationModule = (modulePath: string, moduleExports: any): Naviga
     // Los módulos complejos deben mantener sus archivos routes.ts
     return {
       name: moduleName.charAt(0).toUpperCase() + moduleName.slice(1),
-      href: `/${moduleName}`,
+      href: `/worldGaming/${moduleName}`,
       icon: getIconForModule(moduleName),
       children: []
     };
@@ -78,20 +84,67 @@ const processNavigationModule = (modulePath: string, moduleExports: any): Naviga
   }
 };
 
+// Función para procesar configuraciones de navegación
+const processNavigationConfig = (modulePath: string, moduleExports: any): NavigationItem | null => {
+  try {
+    const moduleName = extractModuleName(modulePath);
+    if (!moduleName) return null;
+
+    // Buscar el export de navegación del módulo
+    const navigationExport = Object.values(moduleExports).find((exportValue: any) => 
+      exportValue && 
+      typeof exportValue === 'object' && 
+      exportValue.name && 
+      exportValue.href && 
+      exportValue.icon
+    ) as NavigationItem;
+
+    if (navigationExport) {
+      return navigationExport;
+    }
+
+    return null;
+  } catch (error) {
+    console.warn(`Error procesando configuración de navegación ${modulePath}:`, error);
+    return null;
+  }
+};
+
 // Función para generar navegación automática
 const generateAutoNavigation = (): NavigationItem[] => {
   const navigationItems: NavigationItem[] = [];
+  const processedHrefs = new Set<string>(); // Para evitar duplicados
+
+  processedHrefs.add('/worldGaming');
+
+  // Procesar configuraciones de navegación primero
+  Object.entries(navigationConfigs).forEach(([path, mod]) => {
+    const navigationItem = processNavigationConfig(path, mod);
+    if (navigationItem && !processedHrefs.has(navigationItem.href)) {
+      navigationItems.push(navigationItem);
+      processedHrefs.add(navigationItem.href);
+    }
+  });
 
   // Procesar módulos de navegación
   Object.entries(navigationModules).forEach(([path, mod]) => {
     const navigationItem = processNavigationModule(path, mod);
-    if (navigationItem) {
+    if (navigationItem && !processedHrefs.has(navigationItem.href)) {
       navigationItems.push(navigationItem);
+      processedHrefs.add(navigationItem.href);
     }
   });
 
-  // Ordenar por nombre
-  return navigationItems.sort((a, b) => a.name.localeCompare(b.name));
+  // Ordenar por nombre (manteniendo /worldGaming al principio)
+  const worldGaming = navigationItems.shift(); // Remover /worldGaming temporalmente
+  const sortedItems = navigationItems.sort((a, b) => a.name.localeCompare(b.name));
+  
+  // Volver a añadir /worldGaming al principio
+  if (worldGaming) {
+    sortedItems.unshift(worldGaming);
+  }
+  
+  return sortedItems;
 };
 
 // Exportar la navegación automática

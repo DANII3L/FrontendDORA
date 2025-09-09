@@ -3,6 +3,7 @@ import React from 'react';
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  variant?: 'default' | 'dark';
 }
 
 interface CardHeaderProps {
@@ -20,9 +21,13 @@ interface CardContentProps {
   className?: string;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className = '' }) => {
+export const Card: React.FC<CardProps> = ({ children, className = '', variant = 'default' }) => {
+  const baseClasses = variant === 'dark' 
+    ? 'bg-white/5 backdrop-blur-sm text-white border-white/10' 
+    : 'bg-white/10 backdrop-blur-sm text-white border-white/20';
+    
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm ${className}`}>
+    <div className={`${baseClasses} rounded-lg border shadow-lg ${className}`}>
       {children}
     </div>
   );
@@ -30,7 +35,7 @@ export const Card: React.FC<CardProps> = ({ children, className = '' }) => {
 
 export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => {
   return (
-    <div className={`px-6 py-4 border-b border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`px-6 py-4 border-b border-white/20 ${className}`}>
       {children}
     </div>
   );
@@ -38,7 +43,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = ''
 
 export const CardTitle: React.FC<CardTitleProps> = ({ children, className = '' }) => {
   return (
-    <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`}>
+    <h3 className={`text-lg font-semibold text-white ${className}`}>
       {children}
     </h3>
   );

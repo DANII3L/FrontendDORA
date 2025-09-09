@@ -13,8 +13,8 @@ const updateUser = async (data: any) => {
     return await apiService.put(`Usuarios/UpdateAsync`, data);
 };
 
-const deleteEntidad = async (entidadId: number, clienteId : number) => {
-    return await apiService.delete('Entidad/delete', `${entidadId}/${clienteId}`);
+const deleteEntidad = async (entidadId: number) => {
+    return await apiService.delete('Entidad/delete', `${entidadId}`);
 };
 
 export { createUser, getUserById, updateUser, deleteEntidad };

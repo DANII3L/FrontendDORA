@@ -5,6 +5,7 @@ import Pagination from '../Pagination';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useNotification } from '../../contexts/NotificationContext';
 import { Link } from 'react-router-dom';
+import { RefreshCw, LucideIcon } from 'lucide-react';
 
 interface CardField {
   label: string;
@@ -20,8 +21,9 @@ interface FilterConfig {
 }
 
 interface DynamicCardListProps {
-  apiEndpoint: string;
-  cardFields: CardField[];
+  // Modo API (comportamiento original)
+  apiEndpoint?: string;
+  cardFields?: CardField[];
   filters?: FilterConfig[];
   pagination?: boolean;
   cardActions?: (item: any) => React.ReactNode;
@@ -34,13 +36,20 @@ interface DynamicCardListProps {
   subtitle?: string;
   newButtonText?: string;
   newButtonLink?: string;
+  newButtonState?: any;
   onNew?: () => void;
   additionalParams?: { [key: string]: any };
+  isLoading?: boolean;
+  
+  // Modo datos estáticos (nuevo comportamiento)
+  data?: any[];
+  emptyMessage?: string;
+  emptyIcon?: LucideIcon;
 }
 
 const DynamicCardList: React.FC<DynamicCardListProps> = ({
   apiEndpoint,
-  cardFields,
+  cardFields = [],
   filters = [],
   pagination = true,
   cardActions,
@@ -53,10 +62,18 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   subtitle,
   newButtonText,
   newButtonLink,
+  newButtonState,
   onNew,
   additionalParams = {},
+  isLoading = false,
+  data: staticData,
+  emptyMessage = "No se encontraron registros",
+  emptyIcon: EmptyIcon,
 }) => {
-  const [data, setData] = useState<any[]>(mockData || []);
+  // Determinar si estamos en modo datos estáticos
+  const isStaticMode = staticData !== undefined;
+  
+  const [data, setData] = useState<any[]>(isStaticMode ? staticData : (mockData || []));
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterValues, setFilterValues] = useState<{ [key: string]: string }>({});
@@ -66,15 +83,25 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   const { addNotification } = useNotification();
 
   useEffect(() => {
+    if (isStaticMode) {
+      setData(staticData);
+      return;
+    }
+    
     if (mockData) {
       setData(mockData);
       return;
     }
-    fetchData();
+    
+    if (apiEndpoint) {
+      fetchData();
+    }
     // eslint-disable-next-line
-  }, [apiEndpoint, mockData, search, filterValues, currentPage, itemsPerPage, additionalParams]);
+  }, [apiEndpoint, mockData, staticData, search, filterValues, currentPage, itemsPerPage, additionalParams, isStaticMode]);
 
   const fetchData = async () => {
+    if (!apiEndpoint) return;
+    
     setLoading(true);
     try {
       const params: any = {};
@@ -143,10 +170,22 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
     setCurrentPage(1);
   };
 
-  // Filtrado local para mockData
+  const handleRefresh = () => {
+    if (isStaticMode || mockData) {
+      // Para datos estáticos o mockData, solo resetear filtros y paginación
+      setSearch('');
+      setFilterValues({});
+      setCurrentPage(1);
+    } else if (apiEndpoint) {
+      // Para API calls, recargar datos
+      fetchData();
+    }
+  };
+
+  // Filtrado local para datos estáticos y mockData
   let filteredData = data;
-  if (mockData) {
-    filteredData = mockData.filter(item => {
+  if (isStaticMode || mockData) {
+    filteredData = data.filter(item => {
       let matches = true;
       filters.forEach(f => {
         if (f.type === 'search' && search) {
@@ -162,98 +201,115 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
   }
 
   let currentItems = data;
-  if (mockData) {
-    // paginación local solo para mockData
+  if (isStaticMode || mockData) {
+    // paginación local solo para datos estáticos y mockData
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   }
 
   // Paginación local
-  const totalRecordsLocal = mockData ? filteredData.length : totalRecords;
+  const totalRecordsLocal = (isStaticMode || mockData) ? filteredData.length : totalRecords;
   const totalPages = Math.max(1, Math.ceil(totalRecordsLocal / itemsPerPage));
 
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header reutilizable */}
       {title && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold text-text-primary">{title}</h1>
-            {subtitle && <p className="text-text-secondary mt-1">{subtitle}</p>}
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">{title}</h1>
+            {subtitle && <p className="text-white/80 mt-1 text-sm sm:text-base">{subtitle}</p>}
           </div>
           {newButtonText && (newButtonLink ? (
             <Link
               to={newButtonLink}
-              className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+              state={newButtonState}
+              className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-white/30 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
-              <PlusIcon className="h-5 w-5" />
+              <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>{newButtonText}</span>
             </Link>
           ) : (
             <button
               onClick={onNew}
-              className="bg-gradient-to-r from-orange-primary to-red-primary hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:border-white/30 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
-              <PlusIcon className="h-5 w-5" />
+              <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>{newButtonText}</span>
             </button>
           ))}
         </div>
       )}
 
-      {/* Filtros */}
+      {/* Filtros - solo mostrar si no estamos en modo datos estáticos o si hay filtros definidos */}
       {filters.length > 0 && (
-        <div className="bg-card-background backdrop-blur-lg p-6 rounded-2xl border border-border">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {filters.map((filter) => {
-              if (filter.type === 'search') {
-                return (
-                  <div key={filter.key} className="flex-1 relative">
-                    <input
-                      type="text"
-                      placeholder={filter.placeholder || 'Buscar...'}
-                      value={search}
-                      onChange={handleSearch}
-                      className="w-full pl-4 pr-4 py-2 bg-background border border-border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-                    />
-                  </div>
-                );
-              }
-              if (filter.type === 'select') {
-                return (
-                  <div key={filter.key} className="flex items-center space-x-2">
-                    <select
-                      value={filterValues[filter.key] || ''}
-                      onChange={e => handleSelect(filter.key, e.target.value)}
-                      className="bg-background border border-border rounded-lg text-text-primary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
-                    >
-                      <option value="">{filter.placeholder || 'Todos'}</option>
-                      {filter.options?.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                );
-              }
-              return null;
-            })}
+        <div className="bg-white/5 backdrop-blur-lg p-4 sm:p-6 rounded-2xl border border-white/10 shadow-lg">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-1">
+              {filters.map((filter) => {
+                if (filter.type === 'search') {
+                  return (
+                    <div key={filter.key} className="flex-1 relative">
+                      <input
+                        type="text"
+                        placeholder={filter.placeholder || 'Buscar...'}
+                        value={search}
+                        onChange={handleSearch}
+                        className="w-full pl-4 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all duration-200"
+                      />
+                    </div>
+                  );
+                }
+                if (filter.type === 'select') {
+                  return (
+                    <div key={filter.key} className="flex items-center space-x-2">
+                      <select
+                        value={filterValues[filter.key] || ''}
+                        onChange={e => handleSelect(filter.key, e.target.value)}
+                        className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all duration-200"
+                      >
+                        <option value="">{filter.placeholder || 'Todos'}</option>
+                        {filter.options?.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
+            
+            {/* Botón de recarga */}
+            <button
+              onClick={handleRefresh}
+              disabled={loading || isLoading}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
+              title="Recargar datos"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading || isLoading ? 'animate-spin' : ''}`} />
+            </button>
           </div>
         </div>
       )}
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
+      <div className={`grid gap-4 sm:gap-6 ${isStaticMode ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+        {loading || isLoading ? (
           <div className="col-span-full text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-primary mx-auto"></div>
-            <p className="mt-2 text-text-secondary">Cargando...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+            <p className="mt-2 text-white/60">Cargando...</p>
           </div>
         ) : currentItems.length === 0 ? (
           <div className="col-span-full text-center py-12">
-            <div className="text-text-secondary text-6xl mb-4">📋</div>
-            <h3 className="text-lg font-medium text-text-primary">No se encontraron registros</h3>
-            <p className="text-text-secondary mt-1">
+            {EmptyIcon ? (
+              <EmptyIcon className="text-white/60 text-6xl mb-4 mx-auto" />
+            ) : (
+              <div className="text-white/60 text-6xl mb-4">📋</div>
+            )}
+            <h3 className="text-lg font-medium text-white">{emptyMessage}</h3>
+            <p className="text-white/60 mt-1">
               {search || Object.values(filterValues).some(v => v) ? 'Intenta con otros filtros' : 'Comienza agregando un nuevo registro'}
             </p>
           </div>
@@ -291,8 +347,9 @@ const DynamicCardList: React.FC<DynamicCardListProps> = ({
 
       {/* Info de paginación */}
       {pagination && totalRecordsLocal > 0 && (
-        <div className="flex justify-end text-sm text-text-secondary">
-          Mostrando página {currentPage} de {totalPages} | Total de registros: {totalRecordsLocal}
+        <div className="flex justify-center sm:justify-end text-xs sm:text-sm text-white/60 text-center sm:text-left">
+          <span className="hidden sm:inline">Mostrando página {currentPage} de {totalPages} | Total de registros: {totalRecordsLocal}</span>
+          <span className="sm:hidden">Página {currentPage} de {totalPages} | {totalRecordsLocal} registros</span>
         </div>
       )}
     </div>

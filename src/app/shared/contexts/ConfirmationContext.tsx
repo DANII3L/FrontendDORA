@@ -39,19 +39,19 @@ export const ConfirmationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     <ConfirmationContext.Provider value={{ showConfirm }}>
       {children}
       {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl p-6 shadow-lg max-w-sm w-full">
-            <h2 className="text-lg font-bold mb-2">{modal.title || '¿Confirmar acción?'}</h2>
-            <p className="mb-4 text-text-secondary">{modal.message}</p>
-            <div className="flex justify-end gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-lg max-w-sm w-full mx-4">
+            <h2 className="text-lg font-bold mb-3 text-white">{modal.title || '¿Confirmar acción?'}</h2>
+            <p className="mb-6 text-white/80">{modal.message}</p>
+            <div className="flex justify-end gap-3">
               <button
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                className="px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-200"
                 onClick={() => handleClose(false)}
               >
                 {modal.cancelText || 'Cancelar'}
               </button>
               <button
-                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                className="px-4 py-2 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-all duration-200"
                 onClick={() => handleClose(true)}
               >
                 {modal.confirmText || 'Confirmar'}

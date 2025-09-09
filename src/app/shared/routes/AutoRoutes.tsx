@@ -3,50 +3,15 @@ import { Route } from 'react-router-dom';
 import { IRouteProps } from '../interface/IRouteProps';
 import { IModuleInfo } from '../interface/IModuleInfo';
 
-// Función para crear una ruta con key única
-const createRoute = (path: string, element: React.ReactElement, key: string): React.ReactElement => {
-  return React.createElement(Route, { key, path, element });
-};
-
-// Función para procesar rutas anidadas
-const processNestedRoutes = (routeElement: React.ReactElement): React.ReactElement[] => {
-  const routes: React.ReactElement[] = [];
-  const parentPath = routeElement.props.path;
-  
-  if (!parentPath) return routes;
-
-  const children = Array.isArray(routeElement.props.children) 
-    ? routeElement.props.children 
-    : [routeElement.props.children];
-
-  children.forEach((child: React.ReactElement) => {
-    if (!React.isValidElement(child) || child.type !== Route) return;
-
-    const childProps = child.props as IRouteProps;
-    
-    if (childProps.index && childProps.element) {
-      routes.push(createRoute(parentPath, childProps.element, `${parentPath}-index`));
-    } else if (childProps.path && childProps.element) {
-      const fullPath = childProps.path.startsWith('/') 
-        ? childProps.path 
-        : `${parentPath}/${childProps.path}`;
-      
-      routes.push(createRoute(fullPath, childProps.element, `${parentPath}-${childProps.path}`));
-    }
-  });
-
-  return routes;
-};
-
 // Función principal para aplanar rutas
 const flattenRoutes = (routeElement: React.ReactElement): React.ReactElement[] => {
   if (routeElement.type !== Route) return [];
 
   const props = routeElement.props as IRouteProps;
 
-  // Todas las rutas ahora son anidadas o simples
+  // Si tiene hijos, devolver solo la ruta padre (las rutas anidadas se manejan automáticamente)
   if (props.children) {
-    return processNestedRoutes(routeElement);
+    return [routeElement];
   }
 
   // Rutas simples
@@ -67,7 +32,7 @@ const routeElements = Object.entries(modules)
   .filter((module): module is IModuleInfo => module !== null)
   .flatMap(({ element }) => flattenRoutes(element))
   .filter((route): route is React.ReactElement => 
-    React.isValidElement(route) && route.type === Route && route.key !== null
+    React.isValidElement(route) && route.type === Route
   );
 
 export { routeElements };

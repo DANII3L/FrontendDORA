@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as segService from './service/segServices';
-import { useCompany } from '../shared/contexts/CompanyContext';
 
 interface User {
   entidadId: number;
@@ -13,7 +12,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, empresaId: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (data: any) => Promise<void>;
   isAuthenticated: boolean;
@@ -33,7 +32,6 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { setCompanyInfo, clearCompanyInfo } = useCompany();
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -44,18 +42,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string, empresaId: string) => {
-    const response = await segService.login({ email, password, empresaId });
+  const login = async (email: string, password: string) => {
+    //const response = await segService.login({ email, password });
+    const response = {
+      success: true,
+      message: 'Inicio de sesión exitoso',
+      data: {
+        token: '1234567890',
+        user: {
+          entidadId: 1,
+          correo: 'john.doe@example.com',
+          nombre: 'John Doe',
+          apellidos: 'Doe',
+          rol: 'admin'
+        }
+      }
+    };
+
     if (response.success) {
       if (response.data?.token && response.data?.user) {
-        const { razonSocial, identificacionFiscal, empresaId: companyId, ...userData } = response.data.user;
-        const companyData = { id: companyId, razonSocial, identificacionFiscal };
-
-        setUser(userData);
-        setCompanyInfo(companyData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('company', JSON.stringify(companyData));
         return true;
       } else {
         throw new Error('Respuesta de API inválida tras un inicio de sesión exitoso.');
@@ -76,7 +84,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     setUser(null);
-    clearCompanyInfo();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
